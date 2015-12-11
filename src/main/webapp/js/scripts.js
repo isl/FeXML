@@ -29,7 +29,7 @@ var treeSelectedLeaf;
 var xpaths, labels, minOccurs, maxOccurs;
 
 
-$(document).ready(function() {
+$(document).ready(function () {
 
 
     var versions = $("#versions").val();
@@ -41,17 +41,23 @@ $(document).ready(function() {
     var type = $("#type").val();
     var id = $("#id").val();
     var attributes = $("#attributes");
+    //            var dynamicLabels = $("#dynamicLabels").val();
 
+    // var lang = $("#lang").val();
+    //alert("lala="+lang);
     if (attributes.length > 0) {
         xmlEditor.showAttrs();
     }
     xmlEditor.setDepth(depth);
+
+    //   xmlEditor.setLang(lang);
 
 
     GLR.messenger.inform({
         msg: _message["downloadingXML"],
         mode: "loading"
     });
+    //    console.time("loadingXML");
 
     if (file.length === 0) {
         $('#xmlString').load("File", {
@@ -63,7 +69,7 @@ $(document).ready(function() {
             collectionID: collectionID,
             xmlId: xmlId,
             entityType: entityType
-        }, function(data) {
+        }, function (data) {
             if (data.error) {
                 GLR.messenger.show({
                     msg: data.error,
@@ -76,7 +82,13 @@ $(document).ready(function() {
                     msg: "ΟΚ",
                     mode: "success"
                 });
+                // alert($("#xmlString").html());
+
+
+
                 init(data);
+
+
             }
         }, "xml");
     } else {
@@ -84,7 +96,8 @@ $(document).ready(function() {
             action: "Open",
             lang: lang,
             file: file
-        }, function(data) {
+                    //xmlFilename:"<?=$xmlFilename?>"
+        }, function (data) {
             if (data.error) {
                 GLR.messenger.show({
                     msg: data.error,
@@ -92,10 +105,15 @@ $(document).ready(function() {
                 });
             }
             else {
+                //  alert($("#xmlString").val());
                 GLR.messenger.inform({
                     msg: "ΟΚ",
                     mode: "success"
                 });
+                //    alert(data);
+
+                //  alert($("#xmlString").html());
+
                 init(data);
 
             }
@@ -104,32 +122,60 @@ $(document).ready(function() {
     }
 
 
+//alert('lala');
+//if ($("#xmlString").val())
+//setTimeout(function() {alert($("#xmlString").val());},1250);
+// xmlEditor.loadXmlFromFile("/lalala", "#xml", function(){
+
+    /*
+     $("#xml").html("<span style='font:italic 11px georgia,serif; color:#f30;'>Please upload a valid XML file.</span>").show();
+     
+     GLR.messenger.showAndHide({
+     msg:"Uploaded file is not valid XML and cannot be edited.",
+     mode:"error",
+     speed:3000
+     });
+     */
+
+//	$("#todos, #links").height($("#about").height()+"px");
 });
 
 function init(xml) {
+    //var depth = $("#depth").val();
     var file = $("#file").val();
     var type = $("#type").val();
     var id = $("#id").val();
+    //    GLR.messenger.inform({
+    //        msg: "test",
+    //        mode: "ready"
+    //    });
+    //   alert($("#xmlString").val());
 
-
-    xmlEditor.loadXmlFromString(xml, "#xml", function() {
+    xmlEditor.loadXmlFromString(xml, "#xml", function () {
         $("#actionButtons").show();
 
+        //        console.timeEnd("loadingXML");
         $("#xml").show();
         loadVars(type);
+        //        createMap();
+        //        xmlEditor.renderTree();
 
-        $("button#saveFile").show().click(function() {
+        //alert("sss");
+        $("button#saveFile").show().click(function () {
             GLR.messenger.show({
+                //   msg:"Αποθήκευση αρχείου...",
                 msg: _message["saving"],
                 mode: "επεξεργασία"
             });
+            //           alert(xmlEditor.getXmlAsString());
             if (file.length == 0) {
                 $.post("File", {
                     xmlString: xmlEditor.getXmlAsString(),
                     action: "Save",
                     type: type,
                     id: id
-                }, function(data) {
+                            //xmlFilename:"<?=$xmlFilename?>"
+                }, function (data) {
                     if (data.error) {
                         GLR.messenger.show({
                             msg: data.error,
@@ -151,8 +197,9 @@ function init(xml) {
 
                             $("<button id='viewFile'>" + label + "</button>")
                                     .appendTo("#actionButtons div")
-                                    .click(function() {
+                                    .click(function () {
                                         window.location.href = window.location.href + "&output=xml";
+                                        //window.open(data.filename);
                                     });
                         }
                     }
@@ -162,7 +209,8 @@ function init(xml) {
                     xmlString: xmlEditor.getXmlAsString(),
                     action: "Save",
                     file: file
-                }, function(data) {
+                            //xmlFilename:"<?=$xmlFilename?>"
+                }, function (data) {
                     if (data.error) {
                         GLR.messenger.show({
                             msg: data.error,
@@ -177,8 +225,9 @@ function init(xml) {
                         if (!$("button#viewFile").length) {
                             $("<button id='viewFile'>View Updated File</button>")
                                     .appendTo("#actionButtons div")
-                                    .click(function() {
+                                    .click(function () {
                                         window.location.href = window.location.href + "&output=xml";
+                                        //window.open(data.filename);
                                     });
                         }
                     }
@@ -187,11 +236,14 @@ function init(xml) {
 
         });
 
-        $("button#validateFile").show().click(function() {
+        $("button#validateFile").show().click(function () {
+            //  alert(lang)
             GLR.messenger.show({
+                // msg:"Έλεγχος XML...",
                 msg: _message["validatingXml"],
                 mode: "επεξεργασία"
             });
+            //alert(xmlEditor.getXmlAsString());
             if (file.length == 0) {
                 $.post("File", {
                     xmlString: xmlEditor.getXmlAsString(),
@@ -199,7 +251,8 @@ function init(xml) {
                     type: type,
                     lang: lang,
                     id: id
-                }, function(data) {
+                            //xmlFilename:"<?=$xmlFilename?>"
+                }, function (data) {
 
                     if (data.error) {
                         GLR.messenger.show({
@@ -221,7 +274,8 @@ function init(xml) {
                     action: "Validate",
                     lang: lang,
                     file: file
-                }, function(data) {
+                            //xmlFilename:"<?=$xmlFilename?>"
+                }, function (data) {
                     if (data.error) {
                         GLR.messenger.show({
                             msg: data.error,
@@ -239,13 +293,14 @@ function init(xml) {
             }
         });
 
-        $("button#referencesButton").show().click(function() {
+        $("button#referencesButton").show().click(function () {
 
             if ($("#references").length > 0) {
                 $("#references").toggle();
             } else {
 
                 GLR.messenger.show({
+                    // msg:"Έλεγχος XML...",
                     msg: _message["referencesEval"],
                     mode: "επεξεργασία"
                 });
@@ -254,7 +309,8 @@ function init(xml) {
                     type: type,
                     lang: lang,
                     id: id
-                }, function(data) {
+                            //xmlFilename:"<?=$xmlFilename?>"
+                }, function (data) {
 
                     if (data.error) {
                         GLR.messenger.show({
@@ -279,31 +335,36 @@ function init(xml) {
         });
     });
     //sets depth
-    $("button#depthButton").show().click(function() {
+    $("button#depthButton").show().click(function () {
         $("button#depthButton").hide();
         $depth = $("<input type='text' style='margin-right:7px' size='10'  id='depth' value=''>" + "</input>");
         $getDepth = $("<button class='submit' id='getDepth'>OK</button>");
         $btnCancel = $("<button class='subbmit' id='removeButton'>X</button>");
 
         $('div#actionButtons').append($depth).append($getDepth).append($btnCancel);
-        $getDepth.click(function() {
+        $getDepth.click(function () {
             var depth = document.getElementById('depth').value;
             for (var i = 0; i < $('.children').length; i++) {
                 var liList = $('.children').get(i).childNodes;
+                // alert(i+"-------->"+liList.length);
                 for (var j = 0; j < liList.length; j++) {
                     var status = liList[j].className;
                     if (status != null) {
                         var id = liList[j].getAttribute('id');
+                        //  alert(liList[j].getAttribute('class'));
                         nodeDepth = id.split("/").length;
                         if (nodeDepth < (depth)) {
                             if (status.indexOf('expandable') != -1) {
                                 status = status.replace('expandable', 'collapsable');
+                                // alert("first "+i+"---->"+status);
                                 liList[j].className = status;
                             }
                         }
                         else {
+                            //alert(status+"----->"+status.indexOf('collapsable')!=-1);
                             if (status.indexOf('collapsable') != -1) {
                                 status = status.replace('collapsable', 'expandable');
+                                //    alert("sec "+i+status);
                                 liList[j].className = status;
                             }
                         }
@@ -312,7 +373,7 @@ function init(xml) {
             }
         });
 
-        $btnCancel.click(function() {
+        $btnCancel.click(function () {
             $('div#actionButtons').find("input#depth, button#getDepth, button#removeButton").remove();
             $("button#depthButton").show();
 
@@ -383,6 +444,7 @@ function toggle_collapse() {
  */
 function toggleNode(node) {
     var $thisLi = $(node).parent();
+    // $thisLi.find(">ul").toggle("normal"); // animate({height:"toggle"});
     if ($thisLi.hasClass("collapsable")) {
         $thisLi.removeClass("collapsable").addClass("expandable");
     }
@@ -395,10 +457,11 @@ function toggleNode(node) {
 
 
 function readURL(input) {
+    //  alert(input);
     if (input.files && input.files[0]) {
         var reader = new FileReader();
 
-        reader.onload = function(e) {
+        reader.onload = function (e) {
             $('#blah').attr('src', e.target.result);
         }
         reader.readAsDataURL(input.files[0]);
@@ -406,6 +469,14 @@ function readURL(input) {
 }
 
 function closeAndUnlock(type, id) {
+    //    if(window.onpagehide || window.onpagehide === null){
+    //        window.addEventListener('pagehide',  centeredPopup("File?action=Close&type="+type+"&id="+id,"lala","300","150"," "), false);
+    //    } else {
+    //        window.addEventListener('unload',  centeredPopup("File?action=Close&type="+type+"&id="+id,"lala","300","150"," "), false);
+    //    }
+    //
+    //    Old way
+    //   centeredPopup('File?action=Close&type='+type+'&id='+id,"lala","300","150"," ");
 
     //Decided tha popup is no longer necessary...
     jQuery.ajax({
@@ -454,18 +525,31 @@ function loading() {
 
 
 function loadVars(type) {
-
+    //    GLR.messenger.inform({
+    //                msg:"loading vars",
+    //                mode: "loading",
+    //                speed: 5000
+    //            });
+    //    alert(schemaName)
+    //    alert(schemaName + ".xpaths")
+    //    alert(localStorage[schemaName + ".xpaths"])
+    //    alert(localStorage[schemaName + ".xpaths"] == "undefined")
     var schemaName = "isl." + synthesisName + ".FeXML." + type + "." + schemaLastVersion;
+    // alert(view);
     if (view === '0') {
         action = "edit";
     } else {
         action = "view";
     }
+    //alert(schemaName);
 
 
 
     if (typeof (Storage) !== "undefined") {
         //localStorage and sessionStorage support!
+
+        //    alert(localStorage[schemaName + ".xpaths"].length);
+        //    alert(localStorage[schemaName + ".xpaths"]);
 
         if (!localStorage[schemaName + ".xpaths"]) { //If first time or xpaths empty (length=2 []), ask server for info (all 4 tables)
             var request = $.ajax({
@@ -474,8 +558,9 @@ function loadVars(type) {
                 async: false
             });
 
-            request.done(function(msg) {
+            request.done(function (msg) {
                 localStorage[schemaName + ".xpaths"] = JSON.stringify(msg.xpaths);
+                //     localStorage[schemaName + "." + lang + ".labels"] = JSON.stringify(msg.labels);
 
                 if ($("#dynamicLabels").val() !== "on") { //Labels do not change all the time, so local storage can be used
                     //Check for specific language
@@ -483,10 +568,14 @@ function loadVars(type) {
                 }
                 labels = JSON.parse(JSON.stringify(msg.labels));
 
+
+
+                //     if (action === "edit") {
                 localStorage[schemaName + ".minOccurs"] = JSON.stringify(msg.minOccurs);
                 localStorage[schemaName + ".maxOccurs"] = JSON.stringify(msg.maxOccurs);
+                //  }
             });
-            request.fail(function(textStatus) {
+            request.fail(function (textStatus) {
                 alert("Request failed: " + textStatus);
             });
 
@@ -507,8 +596,13 @@ function loadVars(type) {
 
         }
 
+
+
+
         xpaths = JSON.parse(localStorage[schemaName + ".xpaths"]);
-     
+        //        if ($("#dynamicLabels").val() == "off") {
+        //            labels = JSON.parse(localStorage[schemaName + "." + lang + ".labels"]);
+        //        }
 
         if (action === "edit") {
             minOccurs = JSON.parse(localStorage[schemaName + ".minOccurs"]);
@@ -525,15 +619,17 @@ function loadVars(type) {
             async: false
         });
 
-        request.done(function(msg) {
+        request.done(function (msg) {
             xpaths = JSON.stringify(msg.xpaths);
+            //     localStorage[schemaName + "." + lang + ".labels"] = JSON.stringify(msg.labels);
             labels = JSON.parse(JSON.stringify(msg.labels));
             if (action === "edit") {
                 minOccurs = JSON.stringify(msg.minOccurs);
                 maxOccurs = JSON.stringify(msg.maxOccurs);
             }
+            //   alert(JSON.stringify(msg));
         });
-        request.fail(function(textStatus) {
+        request.fail(function (textStatus) {
             alert("Request failed: " + textStatus);
         });
 
@@ -542,6 +638,14 @@ function loadVars(type) {
 
     createMap();
     xmlEditor.renderTree();
+
+//    $('#lalakis').lookingfor({
+//        input: $('#filter'),
+//        items: '.nodeName',
+//        highlight: true
+//    });
+
+
 }
 
 function getLabels(type) {
@@ -553,10 +657,10 @@ function getLabels(type) {
         async: false
     });
 
-    request.done(function(msg) {
+    request.done(function (msg) {
         labels = msg.labels;
     });
-    request.fail(function(textStatus) {
+    request.fail(function (textStatus) {
         alert("Request failed: " + textStatus);
 
     });
@@ -602,9 +706,11 @@ function createMap() {
 
         var linkId = "'treeLink" + i + "'";
 
+        //  html = '<li '+open+'><a id='+linkId+' href="#" style="text-decoration:none;" title="'+xpaths[i]+'" onclick="goTo('+linkId+','+xpath+');return false;">'+labels[i]+"</a>";
         html = '<li id=' + linkId + ' title=' + xpaths[i] + ' class="node Type ' + liClassName + '">' +
                 '<div class="' + divClassName + '"  onclick="toggleNode(this);"></div>' +
                 '<span class="nodeName" onclick="goTo(' + linkId + ',' + xpath + ');return false;">' + labels[i] + '</span>';
+        //var dynamicLabels = $("#dynamicLabels").val();
         if ($("#dynamicLabels").val() == "on") {
 
             html = html + '<button id="editLabel"' + i + ' onclick="labelChange(this,' + i + ');" style="opacity: 0.5;" class="edit icon" title="' + _message["rename"] + '">' +
@@ -630,13 +736,27 @@ function createMap() {
 
     $("#map").html(tree);
 
-    $("#map").find("li").each(function() {
+    $("#map").find("li").each(function () {
         if ($(this).siblings().length == 0) {
             // alert($(this).html())
             $(this).addClass("last");
         }
 
     });
+
+
+//     $("#tree").treeview({
+//collapsed: true,
+//prerendered: true,
+//animated: "normal"
+//        });
+
+//    }
+
+
+
+
+
 
 }
 
@@ -665,7 +785,9 @@ function goTo(linkId, elementId) {
 
 
     $previouslySelectedItem.removeAttr("style");
-    
+    //   $("#"+treeSelectedLeaf).css("background-color", "white");
+    //   $("li[id*='"+elementId+"']").css("background-color", "white");
+
     var $selectedItem = $("li[data-path='" + elementId + "']");
 
     if ($selectedItem.hasClass('odd')) {
@@ -704,7 +826,8 @@ function labelChange(but, pathIndex) {
         xpath: xpaths[pathIndex],
         type: $("#type").val(),
         lang: lang
-    }, function(response) {
+    }, function (response) {
+        //alert(response)
         $labelsContainer = $("<div id='labels'>" + response + "</form>").append($btnSaveLabels).append($btnCancel);
 
         $but.hide();
@@ -712,15 +835,16 @@ function labelChange(but, pathIndex) {
 
     }, "html")
 
+    //   $("#"+lang).focus(); does not work
 
-    $btnSaveLabels.click(function() {
+    $btnSaveLabels.click(function () {
 
         var currentLangValue = $btnSaveLabels.parent().siblings(".nodeName").html();
         var newLangValue = $btnSaveLabels.siblings("#" + lang).val();
 
         if (newLangValue != currentLangValue) { //Skip code if value is unchanged!
             //Change tree values
-            $("li[data-path='" + xpaths[pathIndex] + "']").children(".nodeName").each(function() {
+            $("li[data-path='" + xpaths[pathIndex] + "']").children(".nodeName").each(function () {
                 var curValue = $(this).html();
                 var newValue = curValue.replace(currentLangValue, newLangValue);
                 $(this).html(newValue);
@@ -738,7 +862,7 @@ function labelChange(but, pathIndex) {
         var fields = new Array();
         var values = new Array();
         fields = $btnSaveLabels.parent().children("input").serializeArray();
-        $.each(fields, function(index, element) {
+        $.each(fields, function (index, element) {
             values.push(element.value);
         });
 
@@ -746,7 +870,7 @@ function labelChange(but, pathIndex) {
             xpath: xpaths[pathIndex],
             type: $("#type").val(),
             labels: values
-        }, function(response) {
+        }, function (response) {
         }, "html")
 
 
@@ -755,7 +879,7 @@ function labelChange(but, pathIndex) {
         $but.show();
     });
 
-    $btnCancel.click(function() {
+    $btnCancel.click(function () {
 
         $btnCancel.parent().remove();
         $but.show();
@@ -765,16 +889,25 @@ function labelChange(but, pathIndex) {
 
 }
 
+//function progress(percent, $element) {
+//	var progressBarWidth = percent * $element.width() / 100;
+//	$element.find('div').animate({ width: progressBarWidth }, 500).html(percent + "%&nbsp;");
+//}
+
+
 function check(input) {
     input.setCustomValidity("");
     var $input = $(input);
     var message = $input.attr("title");
 
+    //alert($input.attr("title"));
     if (input.validity) {
         if (input.validity.valid === true) {
+            //  alert('valid');
 
             $input.addClass("valid");
         } else {
+            //  alert('invalid');
             input.setCustomValidity(message);
             $input.addClass('invalid');
         }

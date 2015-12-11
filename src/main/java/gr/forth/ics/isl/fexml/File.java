@@ -21,18 +21,17 @@
  * E-mail: isl@ics.forth.gr
  * http://www.ics.forth.gr/isl
  *
- * Authors : Georgios Samaritakis, Konstantina Konsolaki.
- *
+ * Authors : Georgios Samaritakis, Konstantina Konsolaki 
+ * 
  * This file is part of the FeXML webapp.
  */
 package gr.forth.ics.isl.fexml;
 
+import gr.forth.ics.isl.fexml.utilities.Utils;
 import isl.dbms.DBCollection;
 import isl.dbms.DBFile;
 import isl.dms.DMSException;
 import isl.dms.file.DMSTag;
-import static gr.forth.ics.isl.fexml.BasicServlet.applicationCollection;
-import gr.forth.ics.isl.fexml.utilities.Utils;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.DateFormat;
@@ -71,7 +70,12 @@ public class File extends BasicServlet {
             throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
 
+//        if (action.equals("Close")) {
+//            response.setContentType("text/html;charset=UTF-8");
+//        } else {
         response.setContentType("application/xml;charset=UTF-8");
+//        }
+
         String action = request.getParameter("action");
         if (action == null) {
             action = "";
@@ -80,28 +84,44 @@ public class File extends BasicServlet {
         PrintWriter out = response.getWriter();
 
         String xml = request.getParameter("xmlString");
+//        System.out.println(xml);
         //XM not pretty but efficient...
         if (xml != null) {
             xml = xml.replaceAll("parentRefIndex=\"\\d++\"", "");
             xml = xml.replaceAll("\\s*>\\s+<", ">\r\n<");
-          
+            //To remove divs added by Chrome...
+            //xml = xml.replaceAll("</div>", "<br/>").replaceAll("</?div>", "");
+
+            //<style>.*?</style>
+            //<(?!/?\b(b|i|a|br|u)\b)[^<>]+>
+//Test clean dirty Word
+            //      xml = xml.replaceAll("(?s)<style>.*?</style>", "").replaceAll("<(?!/?\\b(b|i|a|br|u)\\b)[^<>]+>", "");
+            // System.out.println("XML=" + xml);
         }
+//        String queryString = URLDecoder.decode(request.getParameter("xmlString"), "ISO-8859-1");
+//        System.out.println("QS="+queryString);
 
         String type = request.getParameter("type");
         String id = request.getParameter("id");
         String file = request.getParameter("file");
+        //     String depth = request.getParameter("depth");
         String lang = request.getParameter("lang");
+//        System.out.println("LANG is "+lang);
         String newTerm = request.getParameter("newTerm");
         String vocFile = request.getParameter("vocFile");
         int vocId = -1;
 
+        //   System.out.println(xml);
         String xmlId = "";
 
+//        System.out.println(type);
+//        System.out.println(id);
         try {
             if (action.equals("Save")) {
                 DBFile dbf = null;
                 if (file != null) {
                     xmlId = file + ".xml";
+//                    System.out.println(xmlId);
                     dbf = new DBFile(super.DBURI, applicationCollection + "/LaAndLi", xmlId, super.DBuser, super.DBpassword);
                     dbf.setXMLAsString(cleanHTML(xml));
                     dbf.store();
@@ -141,22 +161,38 @@ public class File extends BasicServlet {
                         }
                     }
 
+//                    if (type.equals("Archive")) {
+//                        String[] res = dbf.queryString("//ΨηφιακόΑρχείο/text()");
+//                        if (res.length > 0) {
+//                            String filename = res[0];
+//                            DBFile uploadsDBFile = new DBFile(this.DBURI, this.adminCollection, "Uploads.xml", this.DBuser, this.DBpassword);
+//                            String mime = Utils.findMime(uploadsDBFile, filename);
+//                            dbf.xRemove("//admin/type");
+//                            dbf.xInsertAfter("//admin/versions", "<type>" + mime + "</type>");
+//                        }
+//                    }
                     updateReferences(dbf, id, type);
-
+//                    System.out.println(zipFilename);
+//                    System.out.println(type);
                     //Extra Logic for Games/Panoramas only
                     if (type.equals("Game") || type.equals("Video")) {
                         String[] zipFiles = dbf.queryString("//" + type + "/DigitalFile/File/string()");
                         if (zipFiles != null) {
                             if (zipFiles.length > 0) {
                                 String zipFile = zipFiles[0];
+//                                System.out.println(zipFile);
                                 if (!zipFile.equals(zipFilename)) {
                                     String zipFolder = zipFile.substring(0, zipFile.lastIndexOf("."));
+//                                    System.out.println("ZIPFOLDER=" + zipFolder);
 
                                     if (type.equals("Video")) {
                                         type = type + java.io.File.separator + type;
                                     }
                                     //Which reminds me: NEVER EVER USE CLASSIC NAMES FOR YOUR SERVLET (File was an epic fail...)
+//                                java.io.File gamesFolder = new java.io.File(uploadsFolder + type);
+//                                System.out.println(uploadsFolder + type + java.io.File.separator + zipFolder);
                                     java.io.File newFolder = new java.io.File(uploadsFolder + type + java.io.File.separator + zipFolder);
+//                                  System.out.println(uploadsFolder + type + java.io.File.separator + id);
                                     FileUtils.deleteDirectory(new java.io.File(uploadsFolder + type + java.io.File.separator + id));
                                     newFolder.renameTo(new java.io.File(uploadsFolder + type + java.io.File.separator + id));
 
@@ -166,13 +202,15 @@ public class File extends BasicServlet {
                     }
                 }
 
-                 fixTime(dbf);
+                fixTime(dbf);
             } else if (action.equals("Open")) {
                 DBFile dbf = null;
                 if (file != null) {
+                    //System.out.println("1");
                     xmlId = file + ".xml";
                     dbf = new DBFile(super.DBURI, applicationCollection + "/LaAndLi", xmlId, super.DBuser, super.DBpassword);
                 } else {
+                    //System.out.println("2 " + request.getParameter("versions"));
 
                     String versions = request.getParameter("versions");
                     if (versions == null) {
@@ -180,6 +218,7 @@ public class File extends BasicServlet {
                     }
 
                     if (versions.equals("yes")) {
+                        //tomorrow here code
                         String collectionID = request.getParameter("collectionID");
                         String vId = request.getParameter("xmlId");
                         String entityType = request.getParameter("entityType");
@@ -196,11 +235,16 @@ public class File extends BasicServlet {
                 }
                 String test = cleanHTML(dbf.getXMLAsString());
                 out.append(test);
-
+//                out.append(dbf.getXMLAsString().replaceAll("<style>.*?</style>", "").replaceAll("<(?!/?\\b(b|i|a|br|u)\\b)[^<>]+>", ""));
+                // System.out.println(out.toString());
+//
+                //System.out.println(dbf.getXMLAsString().replaceAll("(</?)div", "").replaceAll("</?div>", ""));
+                //dbf.store();
             } else if (action.equals("New")) {
 
                 SchemaFile sch = new SchemaFile(schemaFolder + type + ".xsd");
                 String template = "";
+                // System.out.println(sch.getElements());
                 boolean legacyMode = false;
                 if (sch.getElements().contains(type)) {
                     template = sch.createXMLSubtree(type, "medium");
@@ -235,7 +279,7 @@ public class File extends BasicServlet {
                 String uriValue = this.URI_Reference_Path + uri_name + "/" + newId;
                 dbf.xUpdate("//admin/uri_id", uriValue);
                 if (!editorType.equals("standalone")) {
-                    //Provided by k...
+                    //Provided by konsolak...
                     dbf.xUpdate("//admin/versions/versionId", "1");
                     dbf.xUpdate("//admin/versions/versionUser", username);
                     DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -255,13 +299,16 @@ public class File extends BasicServlet {
                     dbf.xRemove("//admin/type");
                     dbf.xRemove("//admin/versions/numOfVersions");
                     dbf.xRemove("//admin/versions/webVersion");
-                  
+                    // String adminPart = "<admin><id>" + newId + "</id><lang>" + lang + "</lang><creator/><saved/><locked/><status/></admin>";
+                    // dbf.xUpdate("//Οντότητα/*", adminPart);
                 }
 
                 response.sendRedirect("Index?type=" + type + "&id=" + type + newId + "&lang=" + lang);
-               
+                //
+                // dbf.storeInto(actualCol);
             } else if (action.equals("SaveVocTerm")) {
                 DBFile dbf = null;
+//                DBCollection VocDbc = new DBCollection(super.DBURI, applicationCollection + "/" + "Vocabulary", super.DBuser, super.DBpassword);
                 String collectionPath = applicationCollection + "/" + "Vocabulary/" + lang + "/";
                 dbf = new DBFile(super.DBURI, collectionPath, vocFile, super.DBuser, super.DBpassword);
                 vocId = newId(dbf);
@@ -288,6 +335,7 @@ public class File extends BasicServlet {
                     }
                 }
 
+//                System.out.println(dbf.toString());
             } else if (action.equals("references")) {
                 String refs = "";
                 String refs_by = "";
@@ -314,6 +362,7 @@ public class File extends BasicServlet {
                         + "	<refs_by>{$refs_by}</refs_by>\n"
                         + "	<refs>{$refs}</refs>\n"
                         + "</res>";
+                System.out.println(query);
                 String res = dbf.queryString(query)[0];
                 Element e = Utils.getElement(res);
                 NodeList ref_by = e.getElementsByTagName("ref_by");
@@ -392,6 +441,11 @@ public class File extends BasicServlet {
                 html += "</ul>";
                 html += "</ul>";
                 out.append(html);
+            } else if (action.equals("GetMime")) {
+                DBFile uploadsDBFile = new DBFile(this.DBURI, this.adminCollection, "Uploads.xml", this.DBuser, this.DBpassword);
+                String filename = request.getParameter("file");
+                String mime = Utils.findMime(uploadsDBFile, filename);
+                out.append(mime);
             } else {
                 String schemaFilename = "AP";
                 if (file != null) {
@@ -402,7 +456,9 @@ public class File extends BasicServlet {
                 }
                 SchemaFile sch = new SchemaFile(schemaFolder + schemaFilename + ".xsd");
                 if (xml != null) {
-
+//                    System.out.println("********");
+//                    System.out.println(lang);
+//                    System.out.println();
                     out.append(sch.validate(xml, lang));
 
                 } else {
@@ -438,7 +494,23 @@ public class File extends BasicServlet {
         }
 
     }
-    
+    //    private int newId(DBFile vocFile) {
+    //        int newId;
+    //        DBFile[] maxId = vocFile.query("max(//Όρος/@id)");
+    //
+    //        if (maxId.length == 0) {
+    //            newId = 1;
+    //        } else {
+    //            newId = (int) Double.parseDouble(maxId[0].getXMLAsString()) + 1;
+    //        }
+    //
+    //        return newId;
+    //    }
+    //    private void addTerm(DBFile vocFile, int id, String term) {
+    //        String newTermQ = "<Όρος id=\"" + id + "\">" + term + "</Όρος>";
+    ////        System.out.println("NEWTERM=" + newTermQ);
+    //        vocFile.xAppend("//Όροι", newTermQ);
+    //    }
 
     private int newId(DBFile vocFile) {
         int newId;
@@ -460,10 +532,19 @@ public class File extends BasicServlet {
         String parentName = vocFile.query("//name(/*)")[0].toString();
         String childName = vocFile.query("//name(/" + parentName + "/*[1])")[0].toString();
         String newTermQ = "<" + childName + " id=\"" + id + "\">" + term + "</" + childName + ">";
+// System.out.println("NEWTERM=" + newTermQ);
         vocFile.xAppend("//" + parentName + "", newTermQ);
     }
 
+//    private void addTerm(DBFile vocFile, int id, String term) {
+//        String parentName = vocFile.query("//name(/*)")[0].toString();
+//        String childName = vocFile.query("//name(/" + parentName + "/*[1])")[0].toString();
+//        String newTermQ = "<" + childName + " id=\"" + id + "\">" + term + "</" + childName + ">";
+////        System.out.println("NEWTERM=" + newTermQ);
+//        vocFile.xAppend("//" + childName + "", newTermQ);
+//    }
     private String cleanHTML(String input) {
+        //StringBuilder output = new StringBuilder();
 
         //Extra stage to restore CDATA sections when damaged (due to Word paste?)
         ArrayList<String> shouldBeCDATABlocks = findReg("sps_html=[^>]+>(?!<!).*?<", input, Pattern.DOTALL);
@@ -477,18 +558,24 @@ public class File extends BasicServlet {
 
         ArrayList<String> CDATABlocks = findReg("(?<=<!\\[CDATA\\[)\\s*.*?\\s*(?=\\]\\]>)", input, Pattern.DOTALL);
         for (String CDATABlock : CDATABlocks) {
+//            System.out.println(CDATABlock);
             String cleanCDATABlock = CDATABlock.replaceAll("</\\b(div|p)\\b>", "<br/>");
             cleanCDATABlock = cleanCDATABlock.replaceAll("(?s)<style>.*?</style>", "");
             cleanCDATABlock = cleanCDATABlock.replaceAll("<(?!/?\\b(b|i|a|br|u|su[pb])\\b)[^<>]+>", "");
             cleanCDATABlock = cleanCDATABlock.replaceAll("Normal\\s+0\\s+false\\s+false\\s+false\\s+EL\\s+X-NONE\\s+X-NONE\\s+MicrosoftInternetExplorer4\\s*", "");
 
+//            System.out.println("**********");
+//            System.out.println(cleanCDATABlock);
+//            input = input.replace(CDATABlock, "*************");
             input = input.replace(CDATABlock, cleanCDATABlock);
         }
 
+        //StringBuilder output = new StringBuilder(input);
         return input;
     }
 
-    protected static void fixTime( DBFile dbf ) {
+    protected static void fixTime(DBFile dbf) {
+        // System.out.println(dbf.queryString("//ΗμερομηνίαΤιμή[text()!='']"));
         String[] times = dbf.queryString("//DateValue[text()!='']/text()");
 
         for (String time : times) {
@@ -497,15 +584,16 @@ public class File extends BasicServlet {
 
             String from = Integer.toString(sisTime.getFrom());
             String to = Integer.toString(sisTime.getTo());
-          
+            System.out.println("from-->" + from);
+            System.out.println("to---> " + to);
             dbf.xUpdate("//DateValue[text()='" + time + "']/@x", from);
             dbf.xUpdate("//DateValue[text()='" + time + "']/@y", to);
 
         }
+//                         SISdate test = new SISdate(-98299776,-98250816);
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-
     /**
      * Handles the HTTP <code>GET</code> method.
      *

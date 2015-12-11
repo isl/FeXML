@@ -21,15 +21,15 @@
  * E-mail: isl@ics.forth.gr
  * http://www.ics.forth.gr/isl
  *
- * Authors : Georgios Samaritakis, Konstantina Konsolaki.
- *
+ * Authors : Georgios Samaritakis, Konstantina Konsolaki 
+ * 
  * This file is part of the FeXML webapp.
  */
 package gr.forth.ics.isl.fexml.filter;
 
+import gr.forth.ics.isl.fexml.BasicServlet;
 import isl.dbms.DBCollection;
 import isl.dbms.DBFile;
-import gr.forth.ics.isl.fexml.BasicServlet;
 import java.io.IOException;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -80,6 +80,7 @@ public class ValidActionsFilter extends BasicServlet implements Filter {
                 if (type == null) {
                     type = "";
                 }
+                //SAM's addition
                 if (id != null) {
                     if (!id.contains(type)) {
                         id = type + id;
@@ -140,11 +141,13 @@ public class ValidActionsFilter extends BasicServlet implements Filter {
 
 
                                 } else {
-                                    
+                                    //prepei na proste8ei to para8uro me th sunexeia
+                                    //epeksergiasias pu se paei se action unlockedit
                                     displayMsg = "IS_EDITED_BY_YOU";
                                     System.out.println(displayMsg);
                                     hresponse.sendRedirect(synthesisURL + "/SystemMessages?message=" + displayMsg + "&file=" + xmlId + "&lang=" + lang + "&feXMLEditor=yes&type=" + type + "&category=" + category + "&link=yes");
-
+//
+                                    // goOnLink = "Index?type=" + type + "&amp;id=" + id + "&amp;langen&amp;category=primary&amp;action=unlockedit";
                                 }
                             } else {
                                 setAdminProperty("locked", this.username, dbf);
@@ -171,6 +174,7 @@ public class ValidActionsFilter extends BasicServlet implements Filter {
                             }
                         }
                     } else if (category.equals("secondary")) {
+//                        boolean hasDependants = dbf.exist("//admin/refs_by/ref_by[@published='yes']");
 
                         boolean hasDependants = dbf.exist("//admin/refs_by/ref_by[@isUnpublished='false']");
 
@@ -197,6 +201,7 @@ public class ValidActionsFilter extends BasicServlet implements Filter {
 
                         } else if (!docOrg.equals(userOrg)) {
                             //only users of organization can edit an 'Entity'
+                            //displayMsg = Messages.ACCESS_DENIED;
                             displayMsg = "CANNOT_EDIT";
                             System.out.println(displayMsg);
                             hresponse.sendRedirect(synthesisURL + "/SystemMessages?message=" + displayMsg + "&file=" + xmlId + "&lang=" + lang + "&feXMLEditor=yes");
@@ -216,6 +221,7 @@ public class ValidActionsFilter extends BasicServlet implements Filter {
                             } else {
                                 displayMsg = "IS_EDITED_BY_YOU";
                                 System.out.println(displayMsg);
+                                //   goOnLink = "Index?type=" + type + "&id=" + id + "&lang="+lang+"&category=secondary&action=unlockedit";
                                 hresponse.sendRedirect(synthesisURL + "/SystemMessages?message=" + displayMsg + "&file=" + xmlId + "&lang=" + lang + "&feXMLEditor=yes&type=" + type + "&category=" + category + "&link=yes");
                             }
                         } else {
@@ -241,7 +247,7 @@ public class ValidActionsFilter extends BasicServlet implements Filter {
                     } else {
                         chain.doFilter(request, response);
                     }
-                } else if (action.equals("Open") || action.equals("view") || action.equals("Close") || action.equals("Validate") || action.equals("SaveVocTerm") || action.equals("Save") || action.equals("references")) {
+                } else if (action.equals("Open") || action.equals("view") || action.equals("Close") || action.equals("Validate") || action.equals("SaveVocTerm") || action.equals("Save") || action.equals("references") || action.equals("GetMime")) {
                     chain.doFilter(request, response);
                 }
             }

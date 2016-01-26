@@ -30,6 +30,8 @@ package gr.forth.ics.isl.fexml;
 import isl.dbms.DBCollection;
 import isl.dbms.DBFile;
 import isl.dbms.DBMSException;
+import isl.dms.DMSException;
+import isl.dms.file.DMSTag;
 import java.io.IOException;
 import java.io.PrintWriter;
 import javax.servlet.ServletException;
@@ -184,7 +186,13 @@ public class Index extends BasicServlet {
                 }
 
             }
-
+            String uri_name = "";
+            try {
+                uri_name = DMSTag.valueOf("uri_name", "target", type, this.conf)[0];
+            } catch (DMSException ex) {
+                ex.printStackTrace();
+            }
+            xmlMiddle.append("<uri_name>").append(uri_name).append("</uri_name>");
             xmlMiddle.append("</output>");
             out.write(transform(xmlMiddle.toString(), xsl));
         } else {

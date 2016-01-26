@@ -37,12 +37,14 @@ This file is part of the FeXML webapp.
     <xsl:template match="/">
         <xsl:text disable-output-escaping='yes'>&lt;!DOCTYPE html></xsl:text>
         <html>
-              <xsl:variable name="lang" select="//output/lang"/>
-                <xsl:variable name="type" select="//output/type"/>
-                                <xsl:variable name="schemaLastVersion" select="//output/schemaLastVersion"/>
-                                <xsl:variable name="synthesisName" select="//output/synthesisName"/>
+            <xsl:variable name="lang" select="//output/lang"/>
+            <xsl:variable name="type" select="//output/type"/>
+            <xsl:variable name="schemaLastVersion" select="//output/schemaLastVersion"/>
+            <xsl:variable name="synthesisName" select="//output/synthesisName"/>
             <head>
                 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+                <!--Favicon line follows-->
+                <link rel="shortcut icon" href="formating/images/fav.png"/>
                 <title>FeXML</title>
                
 
@@ -51,7 +53,7 @@ This file is part of the FeXML webapp.
                     <xsl:text>'</xsl:text>
                     <xsl:value-of select="$lang"/>
                     <xsl:text>'</xsl:text> ;
-                  var synthesisName = <xsl:text>'</xsl:text>
+                    var synthesisName = <xsl:text>'</xsl:text>
                     <xsl:value-of select="$synthesisName"/>
                     <xsl:text>'</xsl:text> ;
                     var schemaLastVersion = <xsl:text>'</xsl:text>
@@ -81,7 +83,7 @@ This file is part of the FeXML webapp.
                 <div id="header">
                    
                     <div id="info">FeXML
-                        <a href="changes.html" id="home" style="display:inline;">v1.8.5.1 (05/10/2015)</a>
+                        <!--a href="changes.html" id="home" style="display:inline;">v1.8.5.1 (05/10/2015)</a-->
                         <xsl:variable name="siteType">
                             <xsl:choose>
                                 <xsl:when test="$type='Study'">
@@ -149,7 +151,7 @@ This file is part of the FeXML webapp.
                                 <xsl:when test="$lang='en'">View</xsl:when>
                             </xsl:choose>
                         </xsl:variable>
-                              <xsl:variable name="referenceText">
+                        <xsl:variable name="referenceText">
                             <xsl:choose>
                                 <xsl:when test="$lang='gr'">Αναφορές</xsl:when>
                                 <xsl:when test="$lang='en'">References</xsl:when>
@@ -198,7 +200,7 @@ This file is part of the FeXML webapp.
 
                         </xsl:if>
                         <button id="documentMap" title="{$documentMapText}" onclick="openMap();">
-                                <img src="img/documentMap.png" alt="{$documentMapText}" title="{$documentMapText}" />
+                            <img src="img/documentMap.png" alt="{$documentMapText}" title="{$documentMapText}" />
                         </button>
                         <button id="expand" title="{$expandText}" onclick="toggle_expand()">
                             <img src="img/expand.png" alt="{$expandText}" title="{$expandText}" />
@@ -227,9 +229,11 @@ This file is part of the FeXML webapp.
 
                        
                         <div id="nodePath">
-
-                            <xsl:value-of select="//output/URIReferencePath"/>
-                            <xsl:value-of select="$type"/>
+                            <xsl:choose>
+                                <xsl:when test="$lang='gr'">Εγγραφή: </xsl:when>
+                                <xsl:when test="$lang='en'">Record: </xsl:when>
+                            </xsl:choose>
+                            <xsl:value-of select="//output/uri_name"/>
                             <xsl:text>/</xsl:text>
                             <xsl:value-of select="//output/id"/>
                             <br/>
@@ -247,7 +251,7 @@ This file is part of the FeXML webapp.
                 <div   id="xml" style="display:block;">
                    
                     <img src='img/spiffygif_102x102.gif' style="margin:auto;display:block;" />
-</div>
+                </div>
                 
                 <div id="map" style="display:none;">
                     

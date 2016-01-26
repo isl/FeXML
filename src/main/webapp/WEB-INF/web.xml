@@ -167,15 +167,15 @@ This file is part of the FeXML webapp.
     </context-param>
     <context-param>
         <param-name>entityWithPhoto</param-name>
-        <param-value>DigitalArchive</param-value>
+        <param-value>DigitalArchive,Contract</param-value>
     </context-param>
     <filter>
         <filter-name>LoginFilter</filter-name>
-        <filter-class>gr.forth.ics.isl.fexml.LoginFilter</filter-class>
+        <filter-class>gr.forth.ics.isl.fexml.filter.LoginFilter</filter-class>
     </filter>
     <filter>
         <filter-name>ValidActionsFilter</filter-name>
-        <filter-class>gr.forth.ics.isl.fexml.ValidActionsFilter</filter-class>
+        <filter-class>gr.forth.ics.isl.fexml.filter.ValidActionsFilter</filter-class>
     </filter>
     <filter-mapping>
         <filter-name>LoginFilter</filter-name>
@@ -196,7 +196,7 @@ This file is part of the FeXML webapp.
     <!--GZIP part-->
     <filter>
         <filter-name>GZIPFilter</filter-name>
-        <filter-class>isl.GZIPFilter.GZIPFilter</filter-class>
+        <filter-class>gr.forth.ics.isl.GZIPFilter.GZIPFilter</filter-class>
     </filter>
     <filter-mapping>
         <filter-name>GZIPFilter</filter-name>
@@ -261,7 +261,7 @@ This file is part of the FeXML webapp.
     </servlet>
     <servlet>
         <servlet-name>BasicServlet</servlet-name>
-        <servlet-class>isl.site.BasicServlet</servlet-class>
+        <servlet-class>gr.forth.ics.isl.site.BasicServlet</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>File</servlet-name>
@@ -277,15 +277,15 @@ This file is part of the FeXML webapp.
     </servlet>
     <servlet>
         <servlet-name>UploadReceiver</servlet-name>
-        <servlet-class>gr.forth.ics.isl.fexml.UploadReceiver</servlet-class>
+        <servlet-class>gr.forth.ics.isl.fexml.upload.UploadReceiver</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>RequestParser</servlet-name>
-        <servlet-class>gr.forth.ics.isl.fexml.RequestParser</servlet-class>
+        <servlet-class>gr.forth.ics.isl.fexml.upload.RequestParser</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>MultipartUploadParser</servlet-name>
-        <servlet-class>gr.forth.ics.isl.fexml.MultipartUploadParser</servlet-class>
+        <servlet-class>gr.forth.ics.isl.fexml.upload.MultipartUploadParser</servlet-class>
     </servlet>
     <servlet>
         <servlet-name>LaAndLi</servlet-name>

@@ -927,12 +927,12 @@ var xmlEditor = (function() {
                         })
                         .delegate("button.icon", "mouseover", function() {
                             $(this).css({
-                                opacity: 1
+                                opacity: 0.5
                             });
                         })
                         .delegate("button.icon", "mouseout", function() {
                             $(this).css({
-                                opacity: 0.5
+                                opacity:1
                             });
                         })
                         .delegate("li.node", "mouseover", function() {
@@ -1288,7 +1288,7 @@ var xmlEditor = (function() {
             $("*", _self.xml).removeAttr("parentRefIndex"); // clean up remaining parentRefIndex-es
             _self.assignEditHandlers(); // bind in core app afterHtmlRendered
             $("button.icon").css({
-                opacity: 0.5
+                opacity: 1
             });
             _$event.trigger("afterHtmlRendered");
 
@@ -1376,7 +1376,7 @@ var xmlEditor = (function() {
             _traverseDOM(rootNode, appendNode);
             $("*", _self.xml).removeAttr("parentRefIndex"); // clean up remaining parentRefIndex-es
             $("button.icon").css({
-                opacity: 0.5
+                opacity: 1
             });
 
             _$event.trigger("afterHtmlRendered");
@@ -1589,7 +1589,7 @@ var xmlEditor = (function() {
                     backgroundColor: "#ffffff"
                 }, 1500);
                 $child.find("button.icon").css({
-                    opacity: 0.5
+                    opacity: 1
                 });
 
                 $submit1.remove();

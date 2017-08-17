@@ -540,7 +540,7 @@ var xmlEditor = (function() {
 
         assignEditHandlers: function() {
 
-            if (view == 0) {
+            if (view == 0 || view == 2) {
                 $("#xml")
                         .delegate("span.nodeName", "click", function() {
                             _toggleNode.apply($(this).parent().get(0));

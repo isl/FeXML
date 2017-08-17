@@ -127,17 +127,17 @@ public class Index extends BasicServlet {
             if (depth == null || depth.equals("")) {
                 depth = "1";
             }
-            if (action.equals("view")) {
+            if (action.equals("view")) {//view mode is 1
                 xmlMiddle.append("<viewMode>").append("1").append("</viewMode>");
 
                 xmlMiddle.append("<versions>").append(request.getParameter("versions")).append("</versions>");
                 xmlMiddle.append("<collectionID>").append(request.getParameter("collectionID")).append("</collectionID>");
                 xmlMiddle.append("<xmlId>").append(request.getParameter("xmlId")).append("</xmlId>");
                 xmlMiddle.append("<entityType>").append(request.getParameter("entityType")).append("</entityType>");
-
+            } else if (action.equals("editAdmin")) {//introducing editAdmin mode 2 to let only admin mess with labels and tag visibility
+                xmlMiddle.append("<viewMode>").append("2").append("</viewMode>");
             } else {
                 xmlMiddle.append("<viewMode>").append("0").append("</viewMode>");
-
             }
             xmlMiddle.append("<depth>").append(depth).append("</depth>");
             if (attributes != null) {
@@ -149,7 +149,9 @@ public class Index extends BasicServlet {
             xmlMiddle.append("<schemaLastVersion>").append(schemaLastVersion).append("</schemaLastVersion>");
 
             xmlMiddle.append("<URIReferencePath>").append(URI_Reference_Path).append("</URIReferencePath>");
+            if (action.equals("editAdmin")) {
             xmlMiddle.append("<dynamicLabels>").append(dynamicLabels).append("</dynamicLabels>");
+            }
             String joinedString = StringUtils.join(entityWithPhoto, ",");
 
             xmlMiddle.append("<entityWithPhoto>").append(joinedString).append("</entityWithPhoto>");

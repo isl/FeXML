@@ -176,7 +176,7 @@ This file is part of the FeXML webapp.
                             </xsl:choose>
                         </xsl:variable>
 
-                        <xsl:if test="//output/viewMode='0'">
+                        <xsl:if test="//output/viewMode='0' or //output/viewMode='2'">
                             <xsl:if test="//output/editorType='standalone'">
                                 <a href="File?action=New&amp;type={$type}&amp;lang={$lang}&amp;depth={//output/depth}" id="home">
                                     <button id="createFile" title="{$createText}">
@@ -217,7 +217,7 @@ This file is part of the FeXML webapp.
                          
                       
 
-                        <xsl:if test="//output/viewMode='0'">
+                        <xsl:if test="//output/viewMode='0' or //output/viewMode='2'">
                             <xsl:if test="//output/editorType='standalone'">
                                 <a href="" id="home" onclick="centeredPopup('Index?file={$type}&amp;depth=5','myWindow','700','500','yes');return false;">
                                     <button id="settings" title="{$settingsText}">

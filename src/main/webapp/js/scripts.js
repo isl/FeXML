@@ -531,7 +531,7 @@ function loading() {
 function loadVars(type) {
 
     var schemaName = "isl." + synthesisName + ".FeXML." + type + "." + schemaLastVersion;
-    if (view === '0') {
+    if (view !== '1') {
         action = "edit";
     } else {
         action = "view";
@@ -698,8 +698,8 @@ function createMap() {
         //var dynamicLabels = $("#dynamicLabels").val();
         if ($("#dynamicLabels").val() == "on") {
 
-//            html = html + '<button id="editLabel"' + i + ' onclick="labelChange(this,' + i + ');" style="opacity: 0.5;" class="edit icon" title="' + _message["rename"] + '">' +
-//                    '<img style="vertical-align:top" src="css/addRemove.png"></button>';
+            html = html + '<button id="editLabel"' + i + ' onclick="labelChange(this,' + i + ');" style="opacity: 0.5;" class="edit icon" title="' + _message["rename"] + '">' +
+                    '<img style="vertical-align:top" src="css/addRemove.png"></button>';
         }
 
 

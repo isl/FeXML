@@ -206,7 +206,6 @@ public class File extends BasicServlet {
             } else if (action.equals("Open")) {
                 DBFile dbf = null;
                 if (file != null) {
-                    //System.out.println("1");
                     xmlId = file + ".xml";
                     dbf = new DBFile(super.DBURI, applicationCollection + "/LaAndLi", xmlId, super.DBuser, super.DBpassword);
                 } else {

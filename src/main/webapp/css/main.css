@@ -1,5 +1,4 @@
-
-ody
+body
 {
     background: white;
     margin: 0;
@@ -113,8 +112,7 @@ form input[type=submit]
 div#header
 {
     background: #444;
-    height: 60px;
-    height: 80px;
+    height: 90px;
     left: 0;
     margin-bottom: 0px;
     margin-left: 10px;

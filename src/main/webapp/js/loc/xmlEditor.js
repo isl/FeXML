@@ -362,6 +362,10 @@ var xmlEditor = (function() {
 
     function _isLeaf(pathIndex) {
 
+        if (pathIndex === -1) {
+            return true;
+        }
+
         if (xpaths.length === pathIndex + 1) {
             return true;
         } else {
@@ -932,7 +936,7 @@ var xmlEditor = (function() {
                         })
                         .delegate("button.icon", "mouseout", function() {
                             $(this).css({
-                                opacity:1
+                                opacity: 1
                             });
                         })
                         .delegate("li.node", "mouseover", function() {
@@ -1060,7 +1064,13 @@ var xmlEditor = (function() {
                 //                '</li>';
             } else { // display regular node
 
-                nodeHtml = '<li id="' + nodePath + '" title="' + nodePath + '" class="node ' + oddOrEven + ' ' + node.nodeName + ' ' + state + (isLast ? ' last' : '') + '" data-path="' + xpaths[pathIndex] + '" nodeIndex="' + nodeIndex + '" nodeDepth="' + nodeDepth + '"' + nodeFixed + '>' +
+                if (pathIndex == -1) {
+                    xpath = node.nodeName;
+                } else {
+                    xpath = xpaths[pathIndex];
+                }
+
+                nodeHtml = '<li id="' + nodePath + '" title="' + nodePath + '" class="node ' + oddOrEven + ' ' + node.nodeName + ' ' + state + (isLast ? ' last' : '') + '" data-path="' + xpath + '" nodeIndex="' + nodeIndex + '" nodeDepth="' + nodeDepth + '"' + nodeFixed + '>' +
                         '<div class="hitarea' + (isLast ? ' last' : '') + '"/>';
 
                 var spanStyle = "";
@@ -1175,9 +1185,14 @@ var xmlEditor = (function() {
             }
 
 
+            if (pathIndex == -1) {
+                var min = 1;
+                var max = -1;
+            } else {
+                var min = minOccurs[pathIndex];
+                var max = maxOccurs[pathIndex];
+            }
 
-            var min = minOccurs[pathIndex];
-            var max = maxOccurs[pathIndex];
             var removeButtonHtml = "";
             var addButtonHtml = '<button class="add icon" style="display:none;" title="' + _message["duplicate"] + '"><img style="vertical-align:top" src="css/add.png"/></button>';
 

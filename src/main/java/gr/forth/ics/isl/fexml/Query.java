@@ -337,7 +337,7 @@ public class Query extends BasicServlet {
                             verdict = "Element: " + el.getName() + " ## Εμφανίσεις: " + occurs + " ## Επιτρεπτές(" + el.getMinOccurs() + "," + maxOccurs + ") " + actions + "\n";
 
                         }
-}
+                    }
 
                 }
 
@@ -348,20 +348,21 @@ public class Query extends BasicServlet {
             for (String addElem : mayAdd) {
                 if (!addElem.equals("admin")) {
                     String fullPath = xpath + "/" + addElem;
-
-                    String label = getLabelFromXPath(type, fullPath, lang);
-                    if (label == null || label.equals("")) {
-                        label = "(" + addElem + ")";
+                    if (isVisibleFromXPath(type, fullPath, lang)) {//May only add if element is visible, otherwise no point...
+                        String label = getLabelFromXPath(type, fullPath, lang);
+                    
+                        if (label == null || label.equals("")) {
+                            label = "(" + addElem + ")";
+                        }
+                        String tree = sch.createXMLSubtree(fullPath, "minimum");
+                        String encodedTree = StringEscapeUtils.escapeXml(tree);
+                        output.append("<option data-schemaName='").append(addElem).append("' value='").append(encodedTree).append("'>").append(label).append("</option>");
                     }
-                    String tree = sch.createXMLSubtree(fullPath, "minimum");
-                    String encodedTree = StringEscapeUtils.escapeXml(tree);
-                    output.append("<option data-schemaName='").append(addElem).append("' value='").append(encodedTree).append("'>").append(label).append("</option>");
                 }
             }
 
             output.append("</select>^^^"); //ΙΕ bad hack...
             output.append("<select id='remove' style='margin-left:3px;' >");
-
 
             for (int i = 0; i < mayRemove.size(); i++) {
                 String removeElem = mayRemove.get(i);
@@ -458,7 +459,7 @@ public class Query extends BasicServlet {
         if (valuesFromTable != null) {
             for (String valueFromTable : valuesFromTable) {
                 linkToPath = valueFromTable;
-              
+
                 if (linkToPath.contains(",")) {
                     uniqueXpath = linkToPath.split(",")[0];
                 } else {
@@ -473,7 +474,6 @@ public class Query extends BasicServlet {
                     result.put(typeOfvaluesFromTable[0], linkToPath);
                 }
 
-              
             }
         }
         return result;

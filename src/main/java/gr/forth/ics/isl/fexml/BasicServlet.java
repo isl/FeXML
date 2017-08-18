@@ -660,6 +660,17 @@ public class BasicServlet extends HttpServlet {
             return null;
         }
     }
+    public static boolean isVisibleFromXPath(String type, String xpath, String lang) {
+        xpath = xpath.replaceAll("\\[\\d++\\]", "");
+        DBFile nodesFile = new DBFile(BasicServlet.DBURI, applicationCollection + "/LaAndLi", type + ".xml", BasicServlet.DBuser, BasicServlet.DBpassword);
+        String[] displayValues = nodesFile.queryString("//node[xpath='" + xpath + "']/@display/string()");
+       
+        if (displayValues != null && displayValues.length > 0) {
+            return false;
+        } else {
+            return true;
+        }
+    }
 
     public static String getAllLabelsFromXPath(String type, String xpath) {
         xpath = xpath.replaceAll("\\[\\d++\\]", "");

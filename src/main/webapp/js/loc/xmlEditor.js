@@ -156,6 +156,8 @@ var xmlEditor = (function() {
             "remove": "Διαγραφή κόμβου",
             "addRemove": "Προσθαφαίρεση κόμβων",
             "rename": "Μετονομασία",
+            "show": "Εμφάνιση",
+            "hide": "Εξαφάνιση",
             // Info labels
             "type": "Τύπος",
             "length": "Μήκος",
@@ -210,6 +212,8 @@ var xmlEditor = (function() {
             "remove": "Delete node",
             "addRemove": "Add/Remove nodes",
             "rename": "Rename",
+            "show": "Show",
+            "hide": "Hide",
             // Info labels
             "type": "Type",
             "length": "Length",
@@ -260,6 +264,8 @@ var xmlEditor = (function() {
             "remove": "Delete node",
             "addRemove": "Προσθαφαίρεση κόμβων",
             "rename": "Μετονομασία",
+            "show": "Show",
+            "hide": "Hide",
             // Info labels
             "type": "Type",
             "length": "Length",
@@ -1064,13 +1070,18 @@ var xmlEditor = (function() {
                 //                '</li>';
             } else { // display regular node
 
+                visibility = "";
                 if (pathIndex == -1) {
                     xpath = node.nodeName;
+
                 } else {
                     xpath = xpaths[pathIndex];
+                    if (displayValues[pathIndex] === "hidden") {
+                        visibility = "style='display:none'";
+                    }
                 }
 
-                nodeHtml = '<li id="' + nodePath + '" title="' + nodePath + '" class="node ' + oddOrEven + ' ' + node.nodeName + ' ' + state + (isLast ? ' last' : '') + '" data-path="' + xpath + '" nodeIndex="' + nodeIndex + '" nodeDepth="' + nodeDepth + '"' + nodeFixed + '>' +
+                nodeHtml = '<li ' + visibility + ' id="' + nodePath + '" title="' + nodePath + '" class="node ' + oddOrEven + ' ' + node.nodeName + ' ' + state + (isLast ? ' last' : '') + '" data-path="' + xpath + '" nodeIndex="' + nodeIndex + '" nodeDepth="' + nodeDepth + '"' + nodeFixed + '>' +
                         '<div class="hitarea' + (isLast ? ' last' : '') + '"/>';
 
                 var spanStyle = "";

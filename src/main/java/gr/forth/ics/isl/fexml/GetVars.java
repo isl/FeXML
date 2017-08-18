@@ -64,53 +64,66 @@ public class GetVars extends BasicServlet {
         PrintWriter out = response.getWriter();
         String type = request.getParameter("type");
         String lang = request.getParameter("lang");
-        String action = request.getParameter("action");
-        String labelsOnly = request.getParameter("labelsOnly");
+        String labelsAndDisplayValuesOnly = request.getParameter("labelsAndDisplayValuesOnly");
         DBFile nodesFile = new DBFile(BasicServlet.DBURI, applicationCollection + "/LaAndLi", type + ".xml", BasicServlet.DBuser, BasicServlet.DBpassword);
         String nodesQuery = "";
-        if (labelsOnly == null) {
+        System.out.println("");
+        if (labelsAndDisplayValuesOnly == null) {//get all vars
             nodesQuery = "for $node in //node[@type='" + type + "']"
                     + " return"
                     + " <label>"
+                    + "{$node/@display}"
                     + " {$node/xpath}"
                     + " <lang>{$node/" + lang + "/string()}</lang>"
                     + " </label>";
-        } else {
-            nodesQuery = "//node[@type='" + type + "']/" + lang + "/string()";
+        } else {//get only labels and displayValues
+            nodesQuery = "for $node in //node[@type='" + type + "']"
+                    + " return"
+                    + " <label>"
+                    + "{$node/@display}"
+                    + " <lang>{$node/" + lang + "/string()}</lang>"
+                    + " </label>";
+//            nodesQuery = "//node[@type='" + type + "']/" + lang + "/string()";
         }
-        System.out.println(nodesQuery);
         String[] nodes = nodesFile.queryString(nodesQuery);
 
         ArrayList<Element> elements = new ArrayList<Element>();
-            SchemaFile sch = new SchemaFile(schemaFolder + java.io.File.separator + type + ".xsd");
-            try {
-                elements = sch.getElements(type);
-            } catch (NullPointerException ex) { //Old type entities (Authentic)
-                elements = sch.getElements("Οντότητα");
-            }
+        SchemaFile sch = new SchemaFile(schemaFolder + java.io.File.separator + type + ".xsd");
+        try {
+            elements = sch.getElements(type);
+        } catch (NullPointerException ex) { //Old type entities (Authentic)
+            elements = sch.getElements("Οντότητα");
+        }
         ArrayList<String> minOccurs = new ArrayList<String>();
         ArrayList<String> maxOccurs = new ArrayList<String>();
+        ArrayList<String> displayValues = new ArrayList<String>();
 
         ArrayList<String> xpaths = new ArrayList<String>();
         ArrayList<String> labels = new ArrayList<String>();
 
         for (int i = 0; i < nodes.length; i++) {
-            if (labelsOnly != null) {
-                labels.add(nodes[i]);
-            } else {
+            labels.add(getMatch(nodes[i], "(?<=<lang>)[^<]+(?=</lang>)"));
+
+            if (labelsAndDisplayValuesOnly == null) {//get all vars
                 xpaths.add(getMatch(nodes[i], "(?<=<xpath>)[^<]+(?=</xpath>)"));
-                labels.add(getMatch(nodes[i], "(?<=<lang>)[^<]+(?=</lang>)"));
             }
-                minOccurs.add("" + elements.get(i).getMinOccurs());
-                maxOccurs.add("" + elements.get(i).getMaxOccurs());
+            minOccurs.add("" + elements.get(i).getMinOccurs());
+            maxOccurs.add("" + elements.get(i).getMaxOccurs());
+            if (nodes[i].contains("display=\"none\"")) {
+                displayValues.add("hidden");
+            } else {
+                displayValues.add("visible");
+            }
         }
 
         try {
             /* TODO output your page here. You may use following sample code. */
             JSONObject jsonData = new JSONObject();
-                jsonData.put("minOccurs", minOccurs);
-                jsonData.put("maxOccurs", maxOccurs);
-            if (labelsOnly == null) {
+            jsonData.put("minOccurs", minOccurs);
+            jsonData.put("maxOccurs", maxOccurs);
+            jsonData.put("displayValues", displayValues);
+
+            if (labelsAndDisplayValuesOnly == null) {
                 jsonData.put("xpaths", xpaths);
             }
             jsonData.put("labels", labels);

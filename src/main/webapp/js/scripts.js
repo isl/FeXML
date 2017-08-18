@@ -26,7 +26,7 @@
  * This file is part of the FeXML webapp.
  */
 var treeSelectedLeaf;
-var xpaths, labels, minOccurs, maxOccurs;
+var xpaths, labels, minOccurs, maxOccurs, displayValues;
 
 
 $(document).ready(function() {
@@ -557,9 +557,11 @@ function loadVars(type) {
                 if ($("#dynamicLabels").val() !== "on") { //Labels do not change all the time, so local storage can be used
                     //Check for specific language
                     localStorage[schemaName + "." + lang + ".labels"] = JSON.parse(JSON.stringify(msg.labels));
+                    localStorage[schemaName + ".displayValues"] = JSON.stringify(msg.displayValues);
+
                 }
                 labels = JSON.parse(JSON.stringify(msg.labels));
-
+                displayValues = JSON.parse(JSON.stringify(msg.displayValues));
 
 
                 //     if (action === "edit") {
@@ -576,32 +578,27 @@ function loadVars(type) {
         if (typeof (labels) === "undefined") {
             if ($("#dynamicLabels").val() !== "on") { //Labels do not change all the time, so local storage can be used
                 //Check for specific language
-                if (!localStorage[schemaName + "." + lang + ".labels"]) { //If labels are missing, get only them!
-                    localStorage[schemaName + "." + lang + ".labels"] = JSON.stringify(getLabels(type));
+                if (!localStorage[schemaName + "." + lang + ".labels"]) { //If labels are missing, then get them and displayValues!
+                    var labelsAndDisplayValues = getLabelsAndDisplayValues(type);
+                    localStorage[schemaName + "." + lang + ".labels"] = JSON.stringify(labelsAndDisplayValues.labels);
+                    localStorage[schemaName + ".displayValues"] = JSON.stringify(labelsAndDisplayValues.displayValues);
 
                 }
                 labels = JSON.parse(localStorage[schemaName + "." + lang + ".labels"]);
-
+                displayValues = JSON.parse(localStorage[schemaName + ".displayValues"]);
             } else {
-                labels = JSON.parse(JSON.stringify(getLabels(type)));
-            }
+                var labelsAndDisplayValues = getLabelsAndDisplayValues(type);
 
+                labels = JSON.parse(JSON.stringify(labelsAndDisplayValues.labels));
+                displayValues = JSON.parse(JSON.stringify(labelsAndDisplayValues.displayValues));
+            }
         }
 
-
-
-
         xpaths = JSON.parse(localStorage[schemaName + ".xpaths"]);
-        //        if ($("#dynamicLabels").val() == "off") {
-        //            labels = JSON.parse(localStorage[schemaName + "." + lang + ".labels"]);
-        //        }
-
         if (action === "edit") {
             minOccurs = JSON.parse(localStorage[schemaName + ".minOccurs"]);
             maxOccurs = JSON.parse(localStorage[schemaName + ".maxOccurs"]);
         }
-
-
     } else {
         alert("Sorry! No web storage support..");
         // Sorry! No web storage support..
@@ -615,6 +612,8 @@ function loadVars(type) {
             xpaths = JSON.stringify(msg.xpaths);
             //     localStorage[schemaName + "." + lang + ".labels"] = JSON.stringify(msg.labels);
             labels = JSON.parse(JSON.stringify(msg.labels));
+            displayValues = JSON.parse(JSON.stringify(msg.displayValues));
+
             if (action === "edit") {
                 minOccurs = JSON.stringify(msg.minOccurs);
                 maxOccurs = JSON.stringify(msg.maxOccurs);
@@ -633,24 +632,24 @@ function loadVars(type) {
 
 }
 
-function getLabels(type) {
-    var labels;
+function getLabelsAndDisplayValues(type) {
+    var labelsAndDisplayValues;
 
     var request = $.ajax({
         type: "GET",
-        url: "GetVars?type=" + type + "&lang=" + lang + "&action=view&labelsOnly=",
+        url: "GetVars?type=" + type + "&lang=" + lang + "&action=view&labelsAndDisplayValuesOnly=",
         async: false
     });
 
     request.done(function(msg) {
-        labels = msg.labels;
+        labelsAndDisplayValues = msg;
     });
     request.fail(function(textStatus) {
         alert("Request failed: " + textStatus);
 
     });
 
-    return labels;
+    return labelsAndDisplayValues;
 }
 
 function createMap() {
@@ -696,10 +695,19 @@ function createMap() {
                 '<div class="' + divClassName + '"  onclick="toggleNode(this);"></div>' +
                 '<span class="nodeName" onclick="goTo(' + linkId + ',' + xpath + ');return false;">' + labels[i] + '</span>';
         //var dynamicLabels = $("#dynamicLabels").val();
-        if ($("#dynamicLabels").val() == "on") {
+        if ($("#dynamicLabels").val() === "on") {
+            var displayButton;
+            if (displayValues[i] == "visible") {
+                displayButton = '<button id="hide' + i + '" onclick="toggleDisplay(this,' + i + ');" style="opacity: 0.5;" class="edit icon" title="' + _message["hide"] + '">' +
+                        '<img style="vertical-align:top" src="css/eye-slash.png"></button>';
+            } else {
+                displayButton = '<button id="show' + i + '" onclick="toggleDisplay(this,' + i + ');" style="opacity: 0.5;" class="edit icon" title="' + _message["show"] + '">' +
+                        '<img style="vertical-align:top" src="css/eye.png"></button>';
+            }
 
-            html = html + '<button id="editLabel"' + i + ' onclick="labelChange(this,' + i + ');" style="opacity: 0.5;" class="edit icon" title="' + _message["rename"] + '">' +
+            var labelsButton = '<button id="editLabel"' + i + ' onclick="labelChange(this,' + i + ');" style="opacity: 0.5;" class="edit icon" title="' + _message["rename"] + '">' +
                     '<img style="vertical-align:top" src="css/addRemove.png"></button>';
+            html = html + labelsButton + displayButton;
         }
 
 
@@ -728,20 +736,6 @@ function createMap() {
         }
 
     });
-
-
-//     $("#tree").treeview({
-//collapsed: true,
-//prerendered: true,
-//animated: "normal"
-//        });
-
-//    }
-
-
-
-
-
 
 }
 
@@ -794,6 +788,43 @@ function goTo(linkId, elementId) {
 
     }
     treeSelectedLeaf = linkId;
+}
+
+function toggleDisplay(but, pathIndex) {
+
+    $but = $(but);
+    var action;
+    var xpath = xpaths[pathIndex];
+    if ($but.html().indexOf("eye-slash") !== -1) {
+        action = "hide";
+        $but.children("img").attr("src", "css/eye.png");
+        $but.attr("title", _message["show"]);
+    } else {
+        action = "show";
+        $but.children("img").attr("src", "css/eye-slash.png");
+        $but.attr("title", _message["hide"]);
+    }
+    var $node = $but.parents("li");
+    var $nodeParent = $node.parents("li");
+
+    var visibleSiblingsCount = $("li[id='" + $nodeParent.attr("id") + "']").children("ul").find("img[src='css/eye-slash.png']").size();
+    var hiddenSiblingsCount = $("li[id='" + $nodeParent.attr("id") + "']").children("ul").find("img[src='css/eye.png']").size();
+
+    $("li[data-path='" + xpath + "']").toggle();
+    
+    if (action==="hide" && visibleSiblingsCount===0) {
+        console.log("should also hide father?")        
+    } 
+   
+    
+
+    $.post("LaAndLi", {
+        xpath: xpath,
+        type: $("#type").val(),
+        action: action
+    }, function(response) {
+    }, "html")
+
 }
 
 function labelChange(but, pathIndex) {
@@ -874,10 +905,7 @@ function labelChange(but, pathIndex) {
 
 }
 
-//function progress(percent, $element) {
-//	var progressBarWidth = percent * $element.width() / 100;
-//	$element.find('div').animate({ width: progressBarWidth }, 500).html(percent + "%&nbsp;");
-//}
+
 
 
 function check(input) {

@@ -40,8 +40,10 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class LaAndLi extends BasicServlet {
 
-    /** 
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
+    /**
+     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
+     * methods.
+     *
      * @param request servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
@@ -56,34 +58,40 @@ public class LaAndLi extends BasicServlet {
 
         String xpath = request.getParameter("xpath");
         String type = request.getParameter("type");
+        String action = request.getParameter("action");
 
         //Generic language handling
         String labels[] = request.getParameterValues("labels[]");
 
         StringBuilder output = new StringBuilder();
+        if (action == null) {//get/set labels 
+            if (labels == null) {
+                String fullNodeBlock = getAllLabelsFromXPath(type, xpath);
+                ArrayList<String> langLabels = new ArrayList<String>();
 
-        if (labels == null) {
-            String fullNodeBlock = getAllLabelsFromXPath(type, xpath);
-            ArrayList<String> langLabels = new ArrayList<String>();
+                for (String lang : languages) {
+                    langLabels = findReg("(?<=<" + lang + ">)[^<]*(?=</" + lang + ">)", fullNodeBlock, 0);
+                    String langLabel;
+                    if (!langLabels.isEmpty()) {
+                        langLabel = langLabels.get(0);
 
-
-            for (String lang : languages) {
-                langLabels = findReg("(?<=<" + lang + ">)[^<]*(?=</" + lang + ">)", fullNodeBlock, 0);
-                String langLabel;
-                if (!langLabels.isEmpty()) {
-                    langLabel = langLabels.get(0);
-
-                } else {
-                    langLabel = "";
+                    } else {
+                        langLabel = "";
+                    }
+                    output = output.append("<label for='").append(lang).append("'>").append(lang).append(": </label>");
+                    output = output.append("<input id='").append(lang).append("' type='text' size='30' name='").append(lang).append("' value='").append(langLabel).append("'/><br/>");
                 }
-                output = output.append("<label for='").append(lang).append("'>").append(lang).append(": </label>");
-                output = output.append("<input id='").append(lang).append("' type='text' size='30' name='").append(lang).append("' value='").append(langLabel).append("'/><br/>");
+            } else {
+                for (int i = 0; i < languages.length; i++) {
+                    setSpecificLanguageLabelFromXPath(type, xpath, languages[i], labels[i]);
+                }
             }
-        } else {
+        } else {//toggle display
+            System.out.println("ACTION is:" + action);
+            System.out.println("XPATH is=" + xpath);
+            System.out.println("TYPE is=" + type);
+            toggleSpecificNodeDisplayFromXPath(type, xpath, action);
 
-            for (int i = 0; i < languages.length; i++) {
-                setSpecificLanguageLabelFromXPath(type, xpath, languages[i], labels[i]);
-            }
         }
 
         out.println(output);
@@ -92,8 +100,9 @@ public class LaAndLi extends BasicServlet {
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /** 
+    /**
      * Handles the HTTP <code>GET</code> method.
+     *
      * @param request servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
@@ -105,8 +114,9 @@ public class LaAndLi extends BasicServlet {
         processRequest(request, response);
     }
 
-    /** 
+    /**
      * Handles the HTTP <code>POST</code> method.
+     *
      * @param request servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
@@ -118,8 +128,9 @@ public class LaAndLi extends BasicServlet {
         processRequest(request, response);
     }
 
-    /** 
+    /**
      * Returns a short description of the servlet.
+     *
      * @return a String containing servlet description
      */
     @Override

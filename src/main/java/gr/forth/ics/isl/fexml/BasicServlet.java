@@ -129,7 +129,6 @@ public class BasicServlet extends HttpServlet {
         conf = new DMSConfig(this.DBURI, this.adminCollection, this.DBuser, this.DBpassword);
     }
 
-    
     public static Logger getLogger() {
         if (!configured) {
             throw new Error("FATAL ERROR: getLogger() called before init() !");
@@ -230,7 +229,6 @@ public class BasicServlet extends HttpServlet {
         DBCollection collection = connectionPool.connect(DBURI, coll);
         return collection.query(q);
     }
-
 
     public String getDBFileContent(String coll, String id) throws IOException {
         String fileContent = null;
@@ -501,7 +499,6 @@ public class BasicServlet extends HttpServlet {
             }
         }
 
-
         //First of all update admin/refs/ref of file
         if (currentRefs.length > 0) {
             if (refsBlock.length() > 0) {
@@ -512,7 +509,7 @@ public class BasicServlet extends HttpServlet {
         } else {
             if (refsBlock.length() > 0) {
                 dbf.xAppend("//admin", "<refs>" + refsBlock + "</refs>");
-            } 
+            }
         }
 
         //Then add new dependencies
@@ -578,7 +575,6 @@ public class BasicServlet extends HttpServlet {
 
         String fileId = type + id;
 
-     
         String results = getminColl(applicationCollection, type, col);
         String minColl = results.substring(results.indexOf("<coll>") + 6, results.indexOf("</coll>"));
         String minfiles = results.substring(results.indexOf("<min>") + 5, results.indexOf("</min>"));
@@ -680,9 +676,15 @@ public class BasicServlet extends HttpServlet {
         xpath = xpath.replaceAll("\\[\\d++\\]", "");
         DBFile nodesFile = new DBFile(BasicServlet.DBURI, applicationCollection + "/LaAndLi", type + ".xml", BasicServlet.DBuser, BasicServlet.DBpassword);
         nodesFile.xUpdate("//node[xpath='" + xpath + "']/" + lang, value);
-    
-
     }
 
+    public static void toggleSpecificNodeDisplayFromXPath(String type, String xpath, String action) {
+        DBFile nodesFile = new DBFile(BasicServlet.DBURI, applicationCollection + "/LaAndLi", type + ".xml", BasicServlet.DBuser, BasicServlet.DBpassword);
+        if (action.equals("show")) {
+            nodesFile.xRemove("//node[xpath='" + xpath + "']/@display");
+        } else {
+            nodesFile.xAddAttribute("//node[xpath='" + xpath + "']", "display", "none");
+        }
+    }
 
 }

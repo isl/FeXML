@@ -350,11 +350,13 @@ public class Query extends BasicServlet {
                     String fullPath = xpath + "/" + addElem;
                     if (isVisibleFromXPath(type, fullPath, lang)) {//May only add if element is visible, otherwise no point...
                         String label = getLabelFromXPath(type, fullPath, lang);
-                    
+
                         if (label == null || label.equals("")) {
                             label = "(" + addElem + ")";
                         }
+                        fullPath = detectRecursion(fullPath); //to solve recursion problem
                         String tree = sch.createXMLSubtree(fullPath, "minimum");
+
                         String encodedTree = StringEscapeUtils.escapeXml(tree);
                         output.append("<option data-schemaName='").append(addElem).append("' value='").append(encodedTree).append("'>").append(label).append("</option>");
                     }
@@ -400,6 +402,25 @@ public class Query extends BasicServlet {
         } finally {
             out.close();
         }
+    }
+
+    private String detectRecursion(String xpath) {
+        String[] pathComponents = xpath.split("/");
+        String path = "";
+        for (String pathComponent : pathComponents) {
+            if (path.isEmpty()) {
+                path = path + "/" + pathComponent + "/";
+            } else {
+                if (!path.contains("/" + pathComponent + "/")) {
+                    path = path + pathComponent + "/";
+                } else {
+                    int index = path.indexOf("/" + pathComponent + "/") + pathComponent.length() + 2;
+                    path = path.substring(0, index);
+                }
+            }
+        }
+        return path.substring(1, path.length() - 1);
+
     }
 
     private HashMap<String, String> getValueFromAndType(String xpath, String prefix) {

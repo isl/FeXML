@@ -1040,8 +1040,14 @@ var xmlEditor = (function() {
             var pathIndex = jQuery.inArray(nodePath.replace(/\[\d+\]/g, ""), xpaths);
             var label;
 
-            if (pathIndex == -1) {
-                label = node.nodeName;
+            if (pathIndex === -1) {
+                var newPath = detectRecursion(nodePath); //check for recursion
+                pathIndex = jQuery.inArray(newPath, xpaths);
+                if (pathIndex === -1) {//still is -1, show node name instead
+                    label = node.nodeName;
+                } else {//label found when removing recursion
+                    label = labels[pathIndex];
+                }
             } else {
                 label = labels[pathIndex];
             }

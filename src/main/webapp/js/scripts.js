@@ -811,12 +811,12 @@ function toggleDisplay(but, pathIndex) {
     var hiddenSiblingsCount = $("li[id='" + $nodeParent.attr("id") + "']").children("ul").find("img[src='css/eye.png']").size();
 
     $("li[data-path='" + xpath + "']").toggle();
-    
-    if (action==="hide" && visibleSiblingsCount===0) {
-        console.log("should also hide father?")        
-    } 
-   
-    
+
+    if (action === "hide" && visibleSiblingsCount === 0) {
+        console.log("should also hide father?")
+    }
+
+
 
     $.post("LaAndLi", {
         xpath: xpath,
@@ -825,6 +825,25 @@ function toggleDisplay(but, pathIndex) {
     }, function(response) {
     }, "html")
 
+}
+
+function detectRecursion(nodePath) {
+    var pathComponents = nodePath.split("/");
+    var path = "";
+    for (var i = 0; i < pathComponents.length; i++) {
+        if (path === "") {
+            path = path + "/" + pathComponents[i] + "/";
+
+        } else {
+            if (path.indexOf("/"+pathComponents[i]+"/") === -1) {
+                path = path + pathComponents[i] + "/";
+            } else {
+                var index = path.indexOf("/" + pathComponents[i] + "/") + pathComponents[i].length + 2;
+                 path = path.substring(0, index);
+            }
+        }
+    }
+            return path.substring(1, path.length - 1);
 }
 
 function labelChange(but, pathIndex) {

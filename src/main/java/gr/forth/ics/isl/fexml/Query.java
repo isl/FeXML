@@ -239,6 +239,7 @@ public class Query extends BasicServlet {
 
             //For now remove position info from xpath
             xpath = xpath.replaceAll("\\[\\d+\\]", "");
+            xpath = detectRecursion(xpath); //to solve recursion problem
             String[] children = null;
             children = childrenParam.split("___");
 
@@ -250,7 +251,6 @@ public class Query extends BasicServlet {
             ArrayList childrenList = new ArrayList(Arrays.asList(children));
             ArrayList childrenPathsList = new ArrayList(Arrays.asList(childrenPaths));
 
-            //Person example
             SchemaFile sch = new SchemaFile(schemaFolder + type + ".xsd");
 
             ArrayList<Element> elements = sch.getElements(xpath);
@@ -348,15 +348,16 @@ public class Query extends BasicServlet {
             for (String addElem : mayAdd) {
                 if (!addElem.equals("admin")) {
                     String fullPath = xpath + "/" + addElem;
+                    fullPath = detectRecursion(fullPath); //to solve recursion problem
                     if (isVisibleFromXPath(type, fullPath, lang)) {//May only add if element is visible, otherwise no point...
                         String label = getLabelFromXPath(type, fullPath, lang);
 
                         if (label == null || label.equals("")) {
                             label = "(" + addElem + ")";
                         }
-                        fullPath = detectRecursion(fullPath); //to solve recursion problem
-                        String tree = sch.createXMLSubtree(fullPath, "minimum");
 
+                        String tree = sch.createXMLSubtree(fullPath, "minimum");
+                        System.out.println(tree);
                         String encodedTree = StringEscapeUtils.escapeXml(tree);
                         output.append("<option data-schemaName='").append(addElem).append("' value='").append(encodedTree).append("'>").append(label).append("</option>");
                     }

@@ -375,6 +375,15 @@ var xmlEditor = (function() {
         if (xpaths.length === pathIndex + 1) {
             return true;
         } else {
+
+            /*START Code added to overcome recursion issues */
+            var xpath = xpaths[pathIndex];
+            var xpathWithoutRecursion = detectRecursion(xpath);
+            if (xpath !== xpathWithoutRecursion) {
+                pathIndex = jQuery.inArray(xpathWithoutRecursion, xpaths);
+            }
+            /* Code added to overcome recursion issues END*/
+
             if (xpaths[pathIndex + 1].lastIndexOf(xpaths[pathIndex], 0) === 0) {
                 return false;
             } else {

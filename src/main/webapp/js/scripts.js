@@ -556,7 +556,7 @@ function loadVars(type) {
 
                 if ($("#dynamicLabels").val() !== "on") { //Labels do not change all the time, so local storage can be used
                     //Check for specific language
-                    localStorage[schemaName + "." + lang + ".labels"] = JSON.parse(JSON.stringify(msg.labels));
+                    localStorage[schemaName + "." + lang + ".labels"] = JSON.stringify(msg.labels);
                     localStorage[schemaName + ".displayValues"] = JSON.stringify(msg.displayValues);
 
                 }

@@ -82,7 +82,7 @@ This file is part of the FeXML webapp.
    
                 <div id="header">
                    
-                    <div id="info">FeXML
+                    <div id="info">F<span onclick="window.open('about.html');">e</span>XML
                         <!--a href="changes.html" id="home" style="display:inline;">v1.8.5.1 (05/10/2015)</a-->
                         <xsl:variable name="siteType">
                             <xsl:choose>

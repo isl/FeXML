@@ -101,7 +101,7 @@ public class ValidActionsFilter extends BasicServlet implements Filter {
                     action = "edit";
                 }
 
-                if (action.equals("edit")) {
+                if (action.equals("edit") || action.equals("editAdmin")) {//Added editAdmin
                     numericId = id.replace(type, "");
                     String collectionPath = getPathforFile(dbc, xmlId, numericId);
                     DBFile dbf = new DBFile(super.DBURI, collectionPath, xmlId, super.DBuser, super.DBpassword);

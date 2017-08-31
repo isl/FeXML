@@ -867,14 +867,24 @@ var xmlEditor = (function() {
 
 
                             var htmlNodePathWithoutPosition = htmlNodePath.replace(/\[\d+\]/g, "");
-
                             var pathIndex = jQuery.inArray(htmlNodePathWithoutPosition, xpaths);
-
                             var min = minOccurs[pathIndex];
                             var max = maxOccurs[pathIndex];
                             var label = labels[pathIndex];
+                           
+                            if (pathIndex === -1) {
+                                var newPath = detectRecursion(htmlNodePathWithoutPosition); //check for recursion
+                                pathIndex = jQuery.inArray(newPath, xpaths);
+                                if (pathIndex === -1) {//still is -1, show node name instead
+                                    label = node.nodeName;
 
+                                } else {//label found when removing recursion
+                                    min = minOccurs[pathIndex];
+                                    max = maxOccurs[pathIndex];
+                                    label = labels[pathIndex];
 
+                                }
+                            }
                             var nodeLabelName = label;
 
                             //Increment paths by 1 for siblings (Using data-path)

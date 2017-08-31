@@ -542,7 +542,6 @@ function loadVars(type) {
     if (typeof (Storage) !== "undefined") {
         //localStorage and sessionStorage support!
 
-
         if (!localStorage[schemaName + ".xpaths"]) { //If first time or xpaths empty (length=2 []), ask server for info (all 4 tables)
             var request = $.ajax({
                 type: "GET",
@@ -576,6 +575,7 @@ function loadVars(type) {
         }
 
         if (typeof (labels) === "undefined") {
+            alert(labels)
             if ($("#dynamicLabels").val() !== "on") { //Labels do not change all the time, so local storage can be used
                 //Check for specific language
                 if (!localStorage[schemaName + "." + lang + ".labels"]) { //If labels are missing, then get them and displayValues!

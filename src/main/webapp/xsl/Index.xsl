@@ -41,6 +41,7 @@ This file is part of the FeXML webapp.
             <xsl:variable name="type" select="//output/type"/>
             <xsl:variable name="schemaLastVersion" select="//output/schemaLastVersion"/>
             <xsl:variable name="synthesisName" select="//output/synthesisName"/>
+            <xsl:variable name="apos">'</xsl:variable>
             <head>
                 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
                 <!--Favicon line follows-->
@@ -49,27 +50,11 @@ This file is part of the FeXML webapp.
                
 
                 <script>
-                    var lang =
-                    <xsl:text>'</xsl:text>
-                    <xsl:value-of select="$lang"/>
-                    <xsl:text>'</xsl:text> ;
-                    var synthesisName = <xsl:text>'</xsl:text>
-                    <xsl:value-of select="$synthesisName"/>
-                    <xsl:text>'</xsl:text> ;
-                    var schemaLastVersion = <xsl:text>'</xsl:text>
-                    <xsl:value-of select="$schemaLastVersion"/>
-                    <xsl:text>'</xsl:text> ;
-                  
-                    var view =
-                    <xsl:text>'</xsl:text>
-                    <xsl:value-of select="//output/viewMode"/>
-                    <xsl:text>'</xsl:text> ;
-                    
-                    var photoTypes =
-                    <xsl:text>'</xsl:text>
-                    <xsl:value-of select="//output/entityWithPhoto"/>                    
-                    <xsl:text>'</xsl:text> ;
-                    
+                    var lang =<xsl:value-of select="concat($apos,$lang,$apos)"/>;
+                    var synthesisName =<xsl:value-of select="concat($apos,$synthesisName,$apos)"/>;
+                    var schemaLastVersion =<xsl:value-of select="concat($apos,$schemaLastVersion,$apos)"/>;
+                    var view =<xsl:value-of select="concat($apos,//output/viewMode,$apos)"/>;
+                    var photoTypes =<xsl:value-of select="concat($apos,//output/entityWithPhoto,$apos)"/>;                                        
                 </script>
         
                 <link href="js/chosen.css" rel="stylesheet"/>

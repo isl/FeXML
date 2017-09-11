@@ -149,9 +149,8 @@ public class Index extends BasicServlet {
             xmlMiddle.append("<schemaLastVersion>").append(schemaLastVersion).append("</schemaLastVersion>");
 
             xmlMiddle.append("<URIReferencePath>").append(URI_Reference_Path).append("</URIReferencePath>");
-//            if (action.equals("editAdmin")) {
             xmlMiddle.append("<dynamicLabels>").append(dynamicLabels).append("</dynamicLabels>");
-//            }
+
             String joinedString = StringUtils.join(entityWithPhoto, ",");
 
             xmlMiddle.append("<entityWithPhoto>").append(joinedString).append("</entityWithPhoto>");

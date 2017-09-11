@@ -575,7 +575,7 @@ function loadVars(type) {
         }
 
         if (typeof (labels) === "undefined") {
-            alert(labels)
+           
             if ($("#dynamicLabels").val() !== "on") { //Labels do not change all the time, so local storage can be used
                 //Check for specific language
                 if (!localStorage[schemaName + "." + lang + ".labels"]) { //If labels are missing, then get them and displayValues!
@@ -653,7 +653,6 @@ function getLabelsAndDisplayValues(type) {
 }
 
 function createMap() {
-
     var tree = "<ul id='tree' class='treeview'>";
     var xpath = "";
     var followingXpath = "";
@@ -668,10 +667,10 @@ function createMap() {
         var liClassName = "";
         var divClassName = "";
         if (i < xpaths.length - 1) {
-            if (xpaths[i + 1].indexOf(xpaths[i]) != -1) {
+            if (xpaths[i + 1].indexOf(xpaths[i]) !== -1) {
                 divClassName = "hitarea";
                 if (depth < 4) {
-                    if (depth == 1) {
+                    if (depth === 1) {
                         liClassName = "collapsable last";
                     } else {
                         liClassName = "collapsable";
@@ -695,9 +694,10 @@ function createMap() {
                 '<div class="' + divClassName + '"  onclick="toggleNode(this);"></div>' +
                 '<span class="nodeName" onclick="goTo(' + linkId + ',' + xpath + ');return false;">' + labels[i] + '</span>';
         //var dynamicLabels = $("#dynamicLabels").val();
-        if ($("#dynamicLabels").val() === "on") {
+      
+        if ($("#dynamicLabels").val() === "on" && view==='2') {
             var displayButton;
-            if (displayValues[i] == "visible") {
+            if (displayValues[i] === "visible") {
                 displayButton = '<button id="hide' + i + '" onclick="toggleDisplay(this,' + i + ');" style="opacity: 0.5;" class="edit icon" title="' + _message["hide"] + '">' +
                         '<img style="vertical-align:top" src="css/eye-slash.png"></button>';
             } else {
@@ -711,7 +711,7 @@ function createMap() {
         }
 
 
-        if (followingDepth == depth) {
+        if (followingDepth === depth) {
             html = html + '</li>';
         } else if (followingDepth > depth) {
             html = html + '<ul>';

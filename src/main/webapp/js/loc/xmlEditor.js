@@ -235,7 +235,7 @@ var xmlEditor = (function() {
         };
     } else { //Other languages
         _message = {
-            "downloadingXML": "Downloading XML file...",
+           "downloadingXML": "Downloading XML file...",
             "renderingHtml": "Rendering XML tree...",
             "readyToEdit": "Ready to edit.",
             "removeAttrConfirm": "Are you sure want to delete this attribute and its value?",
@@ -253,6 +253,9 @@ var xmlEditor = (function() {
             "xmlLoadProblem": "A problem came up while loading the XML file.",
             "noVocabFound": "Vocabulary not found.",
             "schemaCheckFailed": "Schema connection failed",
+            "validatingXml": "Validating XML ...",
+            "referencesEval": "Create references ...",
+            "saving": "Saving ...",
             // Button labels
             "cancel": "Cancel",
             "add": "Add",
@@ -262,8 +265,8 @@ var xmlEditor = (function() {
             "goDown": "Move one place down",
             "duplicate": "Create duplicate",
             "remove": "Delete node",
-            "addRemove": "Προσθαφαίρεση κόμβων",
-            "rename": "Μετονομασία",
+            "addRemove": "Add/Remove nodes",
+            "rename": "Rename",
             "show": "Show",
             "hide": "Hide",
             // Info labels

@@ -101,8 +101,6 @@ var loggable = function(obj /* , objName, debugMode */) {
     })(prefix);
     return obj;
 };
-
-
 /**
  * xmlEditor
  * Application for loading an XML file into memory, rendering it as an editable HTML tree,
@@ -235,7 +233,7 @@ var xmlEditor = (function() {
         };
     } else { //Other languages
         _message = {
-           "downloadingXML": "Downloading XML file...",
+            "downloadingXML": "Downloading XML file...",
             "renderingHtml": "Rendering XML tree...",
             "readyToEdit": "Ready to edit.",
             "removeAttrConfirm": "Are you sure want to delete this attribute and its value?",
@@ -302,9 +300,7 @@ var xmlEditor = (function() {
      */
     function _traverseDOM(node, func) {
         func(node);
-
         node = node.firstChild;
-
         while (node) {
 
             _traverseDOM(node, func);
@@ -322,7 +318,6 @@ var xmlEditor = (function() {
      */
     function _isCommentNode(node) {
         return (node.nodeType === 8);
-
     }
 
     /**
@@ -337,7 +332,6 @@ var xmlEditor = (function() {
 
     function _get_XPath(elt) {
         var path = '';
-
         for (; elt && elt.nodeType === 1; elt = elt.parentNode) {
             var idx = $(elt.parentNode).children(elt.tagName).index(elt) + 1;
             idx > 1 ? (idx = '[' + idx + ']') : (idx = '');
@@ -590,7 +584,6 @@ var xmlEditor = (function() {
                             $this.siblings().attr("src", "FetchBinFile?file=empty_photo.jpg");
                             //                    alert($this.html());
                             $this.parent().children("button").remove();
-
                             return false;
                         })
 
@@ -665,9 +658,24 @@ var xmlEditor = (function() {
                                         alert(_message["linkFailed"]);
                                     }
                                 }, "html")
+                            } else if (node.getAttributeNode("sps_facet")) {
+                                $.post("Query", {
+                                    facet: node.getAttribute("sps_facet"),
+                                    xpath: _get_XPath(node),
+                                    lang: _lang,
+                                    prefix: "sps",
+                                    id: node.getAttribute("sps_id")
+                                }, function(response) {
+                                    if (response.indexOf("<select") > -1) {
+                                        var mode = "thesaurus";
+                                        _self.editValueSelect($this, node, response, mode, "sps");
+                                    }
+                                    else {
+                                        alert(_message["noVocabFound"]);
+                                    }
+                                }, "html")
                             } else if (node.getAttributeNode("ics_html") || node.getAttributeNode("sps_html")) {
                                 _self.editValue($this, node, _getNodeValue(node), true, "");
-
                             } else if (node.getAttributeNode("sps_browse")) {
                                 var mode = "browse";
                                 _self.editValueBrowse($this, node, "sps");
@@ -677,7 +685,6 @@ var xmlEditor = (function() {
                             } else {
 
                                 var type = $("#type").val();
-
                                 if (type.length > 0) {
                                     $.post("Query", {
                                         xpath: _get_XPath(node),
@@ -745,11 +752,7 @@ var xmlEditor = (function() {
                                 //                        "backgroundColor":"#ffffe0"
                                 "border": "2px dotted #990000"
                             });
-
-
                             var posAsInt = parseInt(new Utils().getPosition(childPath)) - 1;
-
-
                             if (childPath != null) {
                                 if (confirm(_message["removeNodeConfirm"] + childName + ");")) {
                                     _self.deleteNode(node, $editButtonParent, childName, childPath, posAsInt);
@@ -772,48 +775,37 @@ var xmlEditor = (function() {
                             //XML part
                             var node = _getNodeFromElemAttr($this.parent());
                             var nextNode = _getRealNextSibling(node);
-
-
                             utils.swapNodes(node, nextNode);
                             //  alert(_self.getXmlAsString());
                             //HTML part
 
                             var htmlNode = $this.closest("li.node").get(0);
                             var nextHtmlNode = _getRealNextSibling(htmlNode);
-
                             var htmlNodePath = $(htmlNode).attr("id");
                             var nextHtmlNodePath = $(nextHtmlNode).attr("id");
-
                             var htmlNodeActions = $(htmlNode).children(".actionButtons").html();
                             var nextHtmlNodeActions = $(nextHtmlNode).children(".actionButtons").html();
-
                             //Get label rather than node name
                             var dataPath = $(htmlNode).attr("data-path");
                             var pathIndex = jQuery.inArray(dataPath, xpaths);
                             var nodeLabelName = labels[pathIndex];
-
                             //Swap paths
                             utils.setPath(htmlNode, nextHtmlNodePath, nodeLabelName);
                             utils.setPath(nextHtmlNode, htmlNodePath, nodeLabelName);
                             //Swap actions
                             $(htmlNode).children(".actionButtons").html(nextHtmlNodeActions);
                             $(nextHtmlNode).children(".actionButtons").html(htmlNodeActions);
-
                             utils.swapNodes(htmlNode, nextHtmlNode);
-
-
                         })
 
                         //SAM
                         .delegate("button.goUp", "click", function(e) {
                             var utils = new Utils();
-
                             var $this = $(this);
                             //XML part
                             var node = _getNodeFromElemAttr($this.parent());
                             var previousNode = _getRealPreviousSibling(node);
                             utils.swapNodes(node, previousNode);
-
                             //HTML part
 
                             var htmlNode = $this.closest("li.node").get(0);
@@ -822,24 +814,18 @@ var xmlEditor = (function() {
 
                             var htmlNodePath = $(htmlNode).attr("id");
                             var previousHtmlNodePath = $(previousHtmlNode).attr("id");
-
-
                             var htmlNodeActions = $(htmlNode).children(".actionButtons").html();
                             var previousHtmlNodeActions = $(previousHtmlNode).children(".actionButtons").html();
-
                             //Get label rather than node name
                             var dataPath = $(htmlNode).attr("data-path");
                             var pathIndex = jQuery.inArray(dataPath, xpaths);
                             var nodeLabelName = labels[pathIndex];
-
-
                             //Swap paths
                             utils.setPath(htmlNode, previousHtmlNodePath, nodeLabelName);
                             utils.setPath(previousHtmlNode, htmlNodePath, nodeLabelName);
                             //Swap actions
                             $(htmlNode).children(".actionButtons").html(previousHtmlNodeActions);
                             $(previousHtmlNode).children(".actionButtons").html(htmlNodeActions);
-
                             utils.swapNodes(htmlNode, previousHtmlNode);
                         })
 
@@ -848,48 +834,37 @@ var xmlEditor = (function() {
                         .delegate("button.add", "click", function(e) {
                             var utils = new Utils();
                             var $this = $(this);
-
                             //Create index for XML-HTML connection
                             var parentRefIndex = _nodeRefs.length;
-
                             //XML part (easy)
                             var node = _getNodeFromElemAttr($this.parent());
                             var $node = $(node);
                             var $cloneNode = $node.clone().attr("parentRefIndex", parentRefIndex);
                             $cloneNode.insertAfter($node);
-
                             //Have to update nodes stack
                             _nodeRefs.push($cloneNode.get(0));
-
                             //HTML part
                             var htmlNode = $this.closest("li.node").get(0);
                             var $htmlNode = $(htmlNode);
-
                             $htmlNode.children(".actionButtons").children("button.goDown").show();
                             var htmlNodePath = $(htmlNode).attr("id");
-
-
                             var htmlNodePathWithoutPosition = htmlNodePath.replace(/\[\d+\]/g, "");
                             var pathIndex = jQuery.inArray(htmlNodePathWithoutPosition, xpaths);
                             var min = minOccurs[pathIndex];
                             var max = maxOccurs[pathIndex];
                             var label = labels[pathIndex];
-                           
                             if (pathIndex === -1) {
                                 var newPath = detectRecursion(htmlNodePathWithoutPosition); //check for recursion
                                 pathIndex = jQuery.inArray(newPath, xpaths);
                                 if (pathIndex === -1) {//still is -1, show node name instead
                                     label = node.nodeName;
-
                                 } else {//label found when removing recursion
                                     min = minOccurs[pathIndex];
                                     max = maxOccurs[pathIndex];
                                     label = labels[pathIndex];
-
                                 }
                             }
                             var nodeLabelName = label;
-
                             //Increment paths by 1 for siblings (Using data-path)
                             $htmlNode.nextAll('[data-path="' + htmlNodePathWithoutPosition + '"]').each(function(index) {
                                 utils.setPath(this, utils.getNextPath($(this).attr("id")), nodeLabelName);
@@ -898,13 +873,10 @@ var xmlEditor = (function() {
 
                             //Clone node and insert it after original (Also update nodeIndex attr)
                             $cloneNode = $htmlNode.clone();
-
                             utils.setPath($cloneNode.get(0), utils.getNextPath(htmlNodePath), nodeLabelName);
                             $cloneNode.attr("nodeIndex", parentRefIndex).insertAfter($htmlNode);
-
                             var $siblings = $htmlNode.parent().children('[data-path="' + htmlNodePathWithoutPosition + '"]');
                             var siblingsCount = $siblings.length;
-
                             if (min != max) {
                                 $siblings.children(".actionButtons").children("button.add").show();
                                 if (parseInt(siblingsCount) > parseInt(min)) {
@@ -928,7 +900,6 @@ var xmlEditor = (function() {
                             _self.$container.find("button.cancel").remove();
                             _self.$container.find("select#add").remove();
                             _self.$container.find("select#remove").remove();
-
                             e.preventDefault();
                             var $this = $(this),
                                     node = _getNodeFromElemAttr($this);
@@ -1033,7 +1004,6 @@ var xmlEditor = (function() {
         getNewNodeHTML: function(node, state, isLast, pathSoFar) {
 
             var nodeDepth = _getNodeDepth(node);
-
             var oddOrEven;
             if (nodeDepth % 2) {
                 oddOrEven = "odd";
@@ -1052,7 +1022,6 @@ var xmlEditor = (function() {
                     nodeAttrs = _getEditableAttributesHtml(node),
                     nodeValueStr = (nodeValue) ? nodeValue : "<span class='noValue'>" + _message["noTextValue"] + "</span>";
             nodeHtml = "";
-
             if (nodeDepth < _depthThreshold || nodeValue.length) { //Nodes with value should be open!
                 state = "collapsable";
             } else {
@@ -1061,7 +1030,6 @@ var xmlEditor = (function() {
 
             var pathIndex = jQuery.inArray(nodePath.replace(/\[\d+\]/g, ""), xpaths);
             var label;
-
             if (pathIndex === -1) {
                 var newPath = detectRecursion(nodePath); //check for recursion
                 pathIndex = jQuery.inArray(newPath, xpaths);
@@ -1101,7 +1069,6 @@ var xmlEditor = (function() {
                 visibility = "";
                 if (pathIndex == -1) {
                     xpath = node.nodeName;
-
                 } else {
                     xpath = xpaths[pathIndex];
                     if (displayValues[pathIndex] === "hidden") {
@@ -1111,7 +1078,6 @@ var xmlEditor = (function() {
 
                 nodeHtml = '<li ' + visibility + ' id="' + nodePath + '" title="' + nodePath + '" class="node ' + oddOrEven + ' ' + node.nodeName + ' ' + state + (isLast ? ' last' : '') + '" data-path="' + xpath + '" nodeIndex="' + nodeIndex + '" nodeDepth="' + nodeDepth + '"' + nodeFixed + '>' +
                         '<div class="hitarea' + (isLast ? ' last' : '') + '"/>';
-
                 var spanStyle = "";
                 var editButtonHtml = "";
                 if (!_isLeaf(pathIndex) && view != 1) {
@@ -1122,15 +1088,12 @@ var xmlEditor = (function() {
 
 
                 nodeHtml = nodeHtml + '<span ' + spanStyle + ' class="nodeName">' + label + '</span>' + nodeAttrs + editButtonHtml;
-
                 if (view != 1) {
                     nodeHtml = nodeHtml + "<span class='actionButtons'>" + _self.createAllowedActions(node, pathIndex, nodePath) + "</span>";
-
                 } else {
                     nodeValueStr = (nodeValue) ? nodeValue : "<span class='noValue'>" + _message["noTextValueNoEdit"] + "</span>";
                     if (!_isLeaf(pathIndex))
                         return  nodeHtml + '</li>';
-
                 }
                 if (node.getAttributeNode("ics_browse")) {
 
@@ -1151,7 +1114,6 @@ var xmlEditor = (function() {
                     } else {
 
                         encodedNodeValueStr = encodeURIComponent(nodeValueStr);
-
                         var browseValue = node.getAttribute("sps_browse");
                         if (browseValue != '') {
                             fileType = browseValue;
@@ -1170,16 +1132,13 @@ var xmlEditor = (function() {
                                     nodeValueStr = "<img class='uploadedFile' title=" + nodeValueStr.replace(/\s/g, "%20") + " alt=" + nodeValueStr.replace(/\s/g, "%20") + " src='FetchBinFile?size=small&file=" + type.value + "/Photos/" + encodedNodeValueStr.replace(/\s/g, "%20") + "' rel=''/>";
                                 } else {
                                     nodeValueStr = "<img class='uploadedFile' title=" + nodeValueStr.replace(/\s/g, "%20") + " alt=" + nodeValueStr.replace(/\s/g, "%20") + "  rel='FetchBinFile?file=" + type.value + "/" + archiveType + "/" + encodedNodeValueStr.replace(/\s/g, "%20") + "'/>";
-
                                 }
                             }
                         } else {
                             nodeValueStr = "<img class='uploadedFile' title=" + nodeValueStr.replace(/\s/g, "%20") + " alt=" + nodeValueStr.replace(/\s/g, "%20") + " src='FetchBinFile?size=small&file=" + type.value + "/Photos/" + encodedNodeValueStr.replace(/\s/g, "%20") + "' rel=''/>";
-
                         }
                         nodeValueStr = nodeValueStr + "<button style='position:relative;top:-50px;' class='clearImage'>X</button>" +
                                 "<button style='position:relative;left:-24px;top:-3px;' class='previewImage'>-></button>";
-
                     }
                 }
 
@@ -1197,7 +1156,6 @@ var xmlEditor = (function() {
 
                 //                }
                 nodeHtml = nodeHtml + '</li>';
-
             }
             return nodeHtml;
         },
@@ -1205,7 +1163,6 @@ var xmlEditor = (function() {
             //New code to add remove/add functionality...
             var goUpButtonHtml = '<button class="goUp icon" style="display:none;" title="' + _message["goUp"] + '"><img style="vertical-align:top" src="css/arrow_up.png"/></button>';
             var goDownButtonHtml = '<button class="goDown icon" style="display:none;" title="' + _message["goDown"] + '"><img  style="vertical-align:top" src="css/arrow_down.png"/></button>';
-
             var realPreviousSib = _getRealPreviousSibling(node)
 
             if (realPreviousSib != null) {
@@ -1219,7 +1176,6 @@ var xmlEditor = (function() {
             if (realNextSib != null) {
                 if (realNextSib.nodeName == node.nodeName) {
                     goDownButtonHtml = '<button class="goDown icon" title="' + _message["goDown"] + '"><img  style="vertical-align:top" src="css/arrow_down.png"/></button>';
-
                 }
             }
 
@@ -1234,19 +1190,14 @@ var xmlEditor = (function() {
 
             var removeButtonHtml = "";
             var addButtonHtml = '<button class="add icon" style="display:none;" title="' + _message["duplicate"] + '"><img style="vertical-align:top" src="css/add.png"/></button>';
-
-
             if (min != max) {
 
                 var siblingsCount = _getSiblingsCount(node);
-
                 var addButtonStyle = "block";
-
                 if (parseInt(max) != -1 && parseInt(siblingsCount) >= parseInt(max)) {
                     addButtonStyle = "none";
                 }
                 addButtonHtml = '<button class="add icon ' + addButtonStyle + '" title="' + _message["duplicate"] + '"><img style="vertical-align:top" src="css/add.png"/></button>';
-
                 var removeButtonStyle = "none";
                 if (parseInt(siblingsCount) > parseInt(min)) {
                     removeButtonStyle = "block";
@@ -1286,9 +1237,7 @@ var xmlEditor = (function() {
                         nodeHtml = _self.getNewNodeHTML(node, _initNodeState, !realNextSib, ""),
                         $li = $(nodeHtml),
                         $ul;
-
                 _self.log(node.nodeName, parentRefIndex);
-
                 if ($xmlPrevSib.length) { // appending node to previous sibling's parent
                     _self.log("appending to prev sibling's parent");
                     $parent = parentRefs[$xmlPrevSib.attr("parentRefIndex")];
@@ -1298,7 +1247,6 @@ var xmlEditor = (function() {
                     parentRefIndex++;
                     $trueParent = $li;
                     $parent.append($li);
-
                     //Version 1.5 addition to show nodes with value
                     if ($li.hasClass("collapsable")) {
                         $li.parents().removeClass("expandable").addClass("collapsable");
@@ -1319,7 +1267,6 @@ var xmlEditor = (function() {
                      */
                     $ul = $("<ul class='children'></ul>").append($li);
                     $parent.append($ul);
-
                     //Version 1.5 addition to show nodes with value
                     if ($li.hasClass("collapsable")) {
                         $li.parents().removeClass("expandable").addClass("collapsable");
@@ -1338,14 +1285,12 @@ var xmlEditor = (function() {
             } // end of appendNode()
 
             _traverseDOM(_self.xml, appendNode);
-
             $("*", _self.xml).removeAttr("parentRefIndex"); // clean up remaining parentRefIndex-es
             _self.assignEditHandlers(); // bind in core app afterHtmlRendered
             $("button.icon").css({
                 opacity: 1
             });
             _$event.trigger("afterHtmlRendered");
-
         },
         /**
          * Renders XML as an HTML structure. Uses _traverseDOM() to render each node.
@@ -1358,7 +1303,6 @@ var xmlEditor = (function() {
                     $trueParent,
                     parentRefs = [], // hash of references to previous sibling's parents. used for appending next siblings
                     parentRefIndex = _nodeRefs.length;
-
             _$event.trigger("beforeHtmlRendered");
             /**
              * local utility method for appending a single node
@@ -1377,20 +1321,16 @@ var xmlEditor = (function() {
                         nodeHtml = _self.getNewNodeHTML(node, _initNodeState, !realNextSib, rootNodePath),
                         $li = $(nodeHtml),
                         $ul;
-
-
                 _self.log(node.nodeName, parentRefIndex);
                 if (parentRefs.length > 0 && $xmlPrevSib.length) { // appending node to previous sibling's parent
 
                     _self.log("appending to prev sibling's parent");
                     $parent = parentRefs[$xmlPrevSib.attr("parentRefIndex")];
-
                     $xmlPrevSib.removeAttr("parentRefIndex");
                     $(node).attr("parentRefIndex", parentRefIndex);
                     parentRefs[parentRefIndex] = $parent;
                     parentRefIndex++;
                     $trueParent = $li;
-
                     $parent.append($li);
                 } else { // appending a new child
                     //alert("appending new child")
@@ -1432,7 +1372,6 @@ var xmlEditor = (function() {
             $("button.icon").css({
                 opacity: 1
             });
-
             _$event.trigger("afterHtmlRendered");
             return($subtree.html());
         },
@@ -1445,7 +1384,6 @@ var xmlEditor = (function() {
         setNodeValue: function(node, value) {
 
             var $textNodes = _getTextNodes(node);
-
             if ($textNodes.get(0)) {
                 $textNodes.get(0).nodeValue = value;
             }
@@ -1486,13 +1424,11 @@ var xmlEditor = (function() {
             var parentPath = _get_XPath(node);
             var $editButtonParent = $editButton.parent();
             var selects = response.split("^^^", 3);
-
             var $select1 = $(selects[0]);
             var $select2 = $(selects[1]);
             var $schemaChildrenString = $(selects[2]);
             var schemaChildren = $schemaChildrenString.val().split("___");
             var $submit1 = $("<button style='margin-left:3px;' class='submit'>" + _message["add"] + "</button>").click(processCreateChild);
-
             var $submit2 = $("<button style='margin-left:3px;' class='submit'>" + _message["delete"] + "</button>").click(processRemoveChild);
             var $cancel = $("<button style='margin-left:3px;' class='killChild cancel'>" + _message["cancel"] + "</button>").click(function() {
                 $(this).remove();
@@ -1505,9 +1441,7 @@ var xmlEditor = (function() {
                 });
                 $editButton.show();
             });
-
             $cancel.insertAfter($submit2.insertAfter($select2.insertAfter($submit1.insertAfter($select1.insertAfter($editButton)))));
-
             $select2.bind('change', function() { //yada yada });
                 var childPath = $select2.val();
                 $editButtonParent.find("ul.children > li").css({
@@ -1517,7 +1451,6 @@ var xmlEditor = (function() {
                     "border": "2px dotted #990000"
                 });
             });
-
             $select2.bind('click', function() {
                 var childPath = $select2.val();
                 $editButtonParent.find("ul.children > li").css({
@@ -1529,7 +1462,6 @@ var xmlEditor = (function() {
 
                 });
             });
-
             /**
              * Private method for creating a child node.
              */
@@ -1537,15 +1469,10 @@ var xmlEditor = (function() {
 
                 var childName = $select1.find("option:selected").attr("data-schemaName");
                 var childLabel = $select1.find("option:selected").text();
-
                 var $childXML = $($.parseXML($select1.val().replace(/&apos;/g, "'"))).find(childName);
-
                 var $node = $(node);
-
                 var $parent = $editButtonParent.closest("li.node");
-
                 _nodeRefs.push(node);
-
                 var html = _self.renderSubTree($parent, $childXML.get(0), parentPath + "/");
                 if ($node.children().length === 0 || ($node.children().length === 1 && $node.children("admin").length > 0)) {
                     if ($node.children().length === 0) {
@@ -1561,11 +1488,8 @@ var xmlEditor = (function() {
 
                     if ($node.children(childName).length > 0) {//Already exists
                         var position = $node.children(childName).length + 1;
-
                         var myregexp = new RegExp("(\\?<!path=\")" + parentPath + "/" + childName, "g");
-
                         html = html.replace(myregexp, "$&[" + position + "]");
-
                         var $html = $(html);
                         //Next line added to show position in label
                         $html.children(".nodeName").html(childLabel + "[" + position + "]");
@@ -1573,32 +1497,24 @@ var xmlEditor = (function() {
                         var utils = new Utils();
                         utils.updateSubtree($html, parentPath + "/" + childName + "[" + position + "]");
                         utils.updateAllowedActions($html.get(0), position);
-
                         var $index = $node.children(childName + ":last").attr('parentRefIndex');
                         //XML
                         $childXML.insertAfter($node.children(childName + ":last"));
-
                         //HTML
                         $html.insertAfter($parent.find('[nodeindex="' + $index + '"]'));
-
-
                         //Code added to show remove button if element may be removed!
                         var remainingSibsCount = $node.children(childName).length;
                         var childId = parentPath + "/" + childName + "[" + position + "]";
-
                         var pathWithoutPos = childId.replace(/\[\d+\]/g, "");
-
                         var pathIndex = jQuery.inArray(pathWithoutPos, xpaths);
                         if (parseInt(remainingSibsCount) === parseInt(minOccurs[pathIndex])) {
 
                         } else { //Last node. Cannot go down, but it may be deleted!
                             //
                             var $actionButtons = $parent.find("ul.children > li[id='" + childId + "']").children(".actionButtons");
-
                             $actionButtons.children("button.remove").show();
                             $actionButtons.children("button.goDown").hide();
                             $parent.find('[nodeindex="' + $index + '"]').children(".actionButtons").children("button.goDown").show();
-
                         }
 
 
@@ -1606,12 +1522,10 @@ var xmlEditor = (function() {
                         //Replace with following cause IE does not support indexOf...
                         var childIndex = jQuery.inArray(childName, schemaChildren)
                         var found = false;
-
                         for (var i = childIndex - 1; i >= 0; i--) {
                             if (($node.children(schemaChildren[i]).length) > 0) {
 
                                 $index = $node.children(schemaChildren[i] + ":last").attr('parentRefIndex');
-
                                 $childXML.insertAfter($node.children(schemaChildren[i] + ":last"));
                                 //HTML
                                 $(html).insertAfter($parent.find('[nodeindex="' + $index + '"]'));
@@ -1636,7 +1550,6 @@ var xmlEditor = (function() {
 
                 var id = $(html).closest("li.node").attr("nodeIndex");
                 var $child = $parent.find('[nodeindex="' + id + '"]');
-
                 $child.find(">span.nodeName").css({
                     backgroundColor: "#fffc00"
                 }).animate({
@@ -1645,7 +1558,6 @@ var xmlEditor = (function() {
                 $child.find("button.icon").css({
                     opacity: 1
                 });
-
                 $submit1.remove();
                 $select1.remove();
                 $submit2.remove();
@@ -1660,10 +1572,7 @@ var xmlEditor = (function() {
             function processRemoveChild() {
                 var childName = $select2.find("option:selected").text();
                 var childPath = $select2.val();
-
                 var posAsInt = parseInt(new Utils().getPosition(childPath)) - 1;
-
-
                 if (childPath != null) {
 
 
@@ -1678,7 +1587,6 @@ var xmlEditor = (function() {
                 $select2.remove();
                 $cancel.remove();
                 $editButton.show();
-
             }
 
 
@@ -1706,7 +1614,6 @@ var xmlEditor = (function() {
 
                 var dom = new ActiveXObject('Microsoft.XMLDOM');
                 dom.async = false;
-
                 dom.loadXML(xmlStr);
                 if (dom.parseError && dom.parseError.errorCode != 0) {
                     errorMsg = "XML Parsing Error: " + dom.parseError.reason
@@ -1854,10 +1761,8 @@ var xmlEditor = (function() {
         editValue: function($valueWrap, node, value, html, schemaCheckResponse) {
             //              alert("1="+value);
             var example = "";
-
             if (!html && schemaCheckResponse.length > 0) {
                 var schemaChecks = schemaCheckResponse.split("^^^");
-
                 for (var i = 0; i < schemaChecks.length; i++) {
                     var schemaCheckName = schemaChecks[i].split("=", 2)[0];
                     var schemaCheckValue = schemaChecks[i].split("=", 2)[1];
@@ -1881,7 +1786,6 @@ var xmlEditor = (function() {
                 //Create placeholders depending on type
                 var trimmedValueType = valueType.replace(/^\s+|\s+$/g, '')
                 example = trimmedValueType;
-
                 if (_message[trimmedValueType]) {
                     example = _message["example"] + _message[trimmedValueType];
                 }
@@ -1909,13 +1813,10 @@ var xmlEditor = (function() {
                 }
 
                 valueInfoAsHTML = valueInfoAsHTML + " )</label>";
-
             }
             var $field, nodePath;
             var componentType;
             var classOfButtons = "editTextValueButtons";
-
-
             if (valueEnums) {
                 componentType = "select";
                 var enumsTable = valueEnums.split("###___###");
@@ -1926,8 +1827,6 @@ var xmlEditor = (function() {
                 }
                 inputList = inputList + "<select>";
                 $field = $(inputList);
-
-
             } else {
 
                 if (jQuery.browser.msie || ((!valueMaxLength || valueMaxLength > 50) && !valuePatterns)) {
@@ -1957,12 +1856,9 @@ var xmlEditor = (function() {
 
 
             var $info = $(valueInfoAsHTML);
-
             var $btnSubmit = $("<input name='sub' type='submit' style='float:left;' value='OK'/>");
             var $btnCancel = $("<button class='cancel' style='float:right;'>" + _message["cancel"] + "</button>");
             var $btnWrap = $("<div class='" + classOfButtons + "'></div>").append($btnCancel).append($btnSubmit);
-
-
             var $editForm = $("<form id='edit-form' action='javascript:void(0);' method='post'></form>").append($field).append($info).append($btnWrap);
             $valueWrap.hide().parent().append($editForm);
             //SAM's tricks
@@ -1972,22 +1868,17 @@ var xmlEditor = (function() {
                 $field.autosize();
             }
             $field.get(0).focus();
-
-
             if (html) {
                 var xml = _self.getXmlAsString();
                 var $test = $($.parseXML(xml)).find("Entity").children("Link");
-
                 var selectOptions = {};
                 $test.each(function() {
                     var $link = $(this);
-
                     if ($link.text().length > 0) {
                         if (this.getAttributeNode("ics_type")) {
                             selectOptions["Related_" + $link.attr("ics_type") + "_" + $link.attr("ics_id")] = $link.text();
                         } else {
                             selectOptions["Related_" + $link.attr("sps_type") + "_" + $link.attr("sps_id")] = $link.text();
-
                         }
                     }
                 });
@@ -1995,19 +1886,15 @@ var xmlEditor = (function() {
                 $test = $($.parseXML(xml)).find("Components").children("Component").children("Link");
                 $test.each(function() {
                     var $link = $(this);
-
                     if ($link.text().length > 0) {
                         if (this.getAttributeNode("ics_type")) {
                             selectOptions["Components_" + $link.attr("ics_type") + "_" + $link.attr("ics_id")] = $link.text();
                         } else {
 
                             selectOptions["Components_" + $link.attr("sps_type") + "_" + $link.attr("sps_id")] = $link.text();
-
                         }
                     }
                 });
-
-
                 var myNicEditor = new nicEditor({
                     buttonList: ['bold', 'italic', 'underline', 'strikeThrough', 'subscript', 'superscript', 'link', 'link2', 'unlink'],
                     maxHeight: 200,
@@ -2018,8 +1905,6 @@ var xmlEditor = (function() {
                 ).panelInstance(nodePath, {
                     hasPanel: true
                 });
-
-
                 $(myNicEditor).width("600px;");
             }
 
@@ -2029,7 +1914,6 @@ var xmlEditor = (function() {
                 if (html) {
                     var content = myNicEditor.instanceById(nodePath).getContent();
                     myNicEditor.removeInstance(nodePath);
-
                     _self.setNodeValue(node, content); // update XML node value "<![CDATA["+content+"]]>"
                 }
                 else {
@@ -2046,7 +1930,6 @@ var xmlEditor = (function() {
                         var $emptyValue = $("<span class='noValue'>" + _message["noTextValue"] + "</span>");
                         value = $emptyValue.html();
                         $valueWrap.text(value).show().parent().find("textarea, div.editTextAreaValueButtons").remove();
-
                     } else {
                         $valueWrap.contents().remove();
                         $valueWrap.append(content).show().parent().find("textarea, div.editTextAreaValueButtons").remove();
@@ -2064,23 +1947,17 @@ var xmlEditor = (function() {
                     myNicEditor.removeInstance(nodePath);
                 }
                 $valueWrap.show().parent().find("form, textarea,label, input, div.editTextValueButtons").remove();
-
             });
-
-
-
         },
         editValueBrowse: function($valueWrap, node, prefix) {
             //            var imageId = "$valueWrap.parent().parent().parent().attr("id");
             $uploadForm = $("<form id='upload-form' action='' method='post' enctype='multipart/form-data'>"
                     + "<div id='jquery-wrapped-fine-uploader'></div>"
                     + "</form>");
-
-            var fileType = "photo";  //Default value
+            var fileType = "photo"; //Default value
             var allowedExtensions = ['jpeg', 'jpg', 'gif', 'png'];
             var uploadMessage = _message["uploadImageMessage"];
             var browseValue = node.getAttribute(prefix + "_browse");
-
             if (browseValue != '') {
                 fileType = browseValue;
                 if (fileType == "audio") {
@@ -2099,14 +1976,10 @@ var xmlEditor = (function() {
             }
 
             var $btnSubmit = $("<button class='ok' style='float:left;'>OK</button>");
-
             var $btnCancel = $("<button class='cancel' style='float:right;'>" + _message["cancel"] + "</button>");
             var $btnWrap = $("<div class='editTextValueButtons'></div>").append($btnCancel).append($btnSubmit);
-
             $valueWrap.hide().parent().append($uploadForm).append($btnWrap);
             $valueWrap.parent().find('.qq-upload-button').css('background-image', 'url(' + $valueWrap.attr("src") + ')');
-
-
             var url;
             var binaryUrl = "";
             var filename;
@@ -2156,26 +2029,20 @@ var xmlEditor = (function() {
                     }
 
                     $valueWrap.parent().find('.qq-upload-button').css('background-image', 'url("' + url + '")');
-
                 }
             });
-
-
             $btnSubmit.click(function() {
                 $valueWrap.show().parent().find("form, input, div.editTextValueButtons, button").remove();
                 $valueWrap.children("img").attr("src", url).attr("title", filename).attr("alt", filename).attr("rel", binaryUrl);
-
                 var $btnClear = $("<button style='position:relative;top:-50px;' class='clearImage'>X</button>");
                 var $btnPreview = $("<button style='position:relative;left:-27px;top:-3px;' class='previewImage'>-></button>");
                 $valueWrap.append($btnClear).append($btnPreview);
                 $valueWrap.show();
             });
-
             $btnCancel.click(function() {
 
                 $valueWrap.show().parent().find("form, input, div.editTextValueButtons").remove();
             });
-
         },
         /**
          * Displays form for editing text value of passed node, then processes new value
@@ -2191,18 +2058,19 @@ var xmlEditor = (function() {
                     $btnSubmit = $("<button class='submit' style='float:left;'>ΟΚ</button>"),
                     $btnCancel = $("<button class='cancel' style='float:right;'>" + _message["cancel"] + "</button>"),
                     $btnWrap = $("<div class='editTextValueButtons'></div>").append($btnCancel).append($btnSubmit);
-            if (mode == "entity") {
+            if (mode === "entity") {
                 var btnGo = "";
                 $btnGo = $("<button class='submit go'>-></button>");
                 $valueWrap.hide().parent().append($field).append($btnGo).append($btnWrap);
             }
-            else if (mode == "vocabulary") {
+            else if (mode === "vocabulary") {
                 var btnVoc = "";
                 $btnVoc = $("<button id='voc'>+</button>");
                 $valueWrap.hide().parent().append($field).append($btnVoc).append($btnWrap);
-
-            }
-            else {
+            } else if (mode === "thesaurus") {
+                $btnTh = $("<button id='th'>TH</button>");
+                $valueWrap.hide().parent().append($field).append($btnTh).append($btnWrap);
+            } else {
                 $valueWrap.hide().parent().append($field).append($btnWrap);
             }
             $field.get(0).focus();
@@ -2215,13 +2083,14 @@ var xmlEditor = (function() {
                 var select = $(this).parent().parent()[0].getElementsByTagName("select")[0];
                 value = $field.val();
                 var id = select.options[select.selectedIndex].getAttribute("data-id");
-
                 _self.setNodeValue(node, value);
                 _self.setAttribute(node, prefix + "_id", id);
-
                 if (mode == "entity") {
                     type = select.options[select.selectedIndex].getAttribute("data-type");
                     _self.setAttribute(node, prefix + "_type", type);
+                } else if (mode === "thesaurus") {
+                    facet = select.getAttribute("data-facet");
+                    _self.setAttribute(node, prefix + "_facet", facet);
                 } else {
                     vocabulary = select.getAttribute("data-vocabulary");
                     _self.setAttribute(node, prefix + "_vocabulary", vocabulary);
@@ -2253,18 +2122,14 @@ var xmlEditor = (function() {
                         title: $field.val()
 
                     });
-
                     $valueWrap.hide().parent().append($field).append($image).append($btnGo).append($btnWrap);
-
                 }
 
 
                 $btnGo.click(function() {
                     var select = $(this).parent().parent()[0].getElementsByTagName("select")[0];
-
                     value = $field.val();
                     var id = select.options[select.selectedIndex].getAttribute("data-id");
-
                     if (id > 0) {
                         var type = select.options[select.selectedIndex].getAttribute("data-type");
                         var popUpURL = document.URL.replace(/type=([^&]+)/g, "type=" + type);
@@ -2277,14 +2142,11 @@ var xmlEditor = (function() {
                 $btnVoc.click(function() {
                     $(this).hide();
                     var $newTermDiv = $("<div class='newTermDiv' style='margin:3px;padding:3px;width:400px;border:1px dotted black;'></div>");
-
                     $boldText = $("<b> " + _message['newTerm'] + "</b>");
                     $textVoc = $("<input type='text' style='width:250px; height:18px'  id='newvoc' value=''>" + "</input>");
                     $btnAddTerm = $("<button class='submit' id='addTermButton'>OK</button>");
                     $btnCancelVoc = $("<button class='subbmit' id='removeTermButton'>X</button>");
-
                     $newTermDiv = $newTermDiv.append($boldText).append($textVoc).append($btnAddTerm).append($btnCancelVoc);
-
                     $valueWrap.hide().parent().append($field).append($(this)).append($newTermDiv).append($btnWrap);
                     $btnAddTerm.click(function() {
                         var thisInput = $(this).siblings("input");
@@ -2301,7 +2163,6 @@ var xmlEditor = (function() {
                             if (savedTerm == term) {
                                 alert(_message["existsTerm"]);
                                 return false;
-
                             }
                         }
                         vocabulary = select.getAttribute("data-vocabulary");
@@ -2315,25 +2176,31 @@ var xmlEditor = (function() {
                         }, function(response) {
                             id = response.replace(/\s+/g, "");
                             $option = $("<option value='" + term + "' data-id='" + id + "'>" + term + "</option>");
-
                             $select.append($option);
                             $select.trigger("liszt:updated");
-
                         }, "html");
                         alert(_message['addedTerm']);
                         _self.setAttribute(thisInput, "value", "");
-
-
                     });
                     $btnCancelVoc.click(function() {
                         var voc = $(this).parent().siblings("button#voc");
                         voc.show();
                         $valueWrap.show().parent().find("div.newTermDiv").remove();
                         $valueWrap.hide().parent().append($field).append(voc).append($btnWrap);
-
                     });
-
-
+                });
+            } else if (mode==="thesaurus") {
+                $btnTh.click(function() {
+                    var select = $(this).parent().parent()[0].getElementsByTagName("select")[0];
+                    value = $field.val();
+                    var id = select.options[select.selectedIndex].getAttribute("data-id");
+                    if (id > 0) {
+                        var type = select.options[select.selectedIndex].getAttribute("data-type");
+                        var popUpURL = document.URL.replace(/type=([^&]+)/g, "type=" + type);
+//                        popUpURL = popUpURL.replace(/id=([^&]+)/g, "id=" + id);
+popUpURL = "http://139.91.183.97:8080/THEMAS/hierarchysTermsShortcuts?action=GlobalThesarusHierarchical&answerType=XMLSTREAM&external_user=ExternalReader&external_thesaurus=TESTDATA";
+                        centeredPopup(popUpURL, 'myWindow', '700', '500', 'yes');
+                    }
                 });
             }
 
@@ -2361,10 +2228,8 @@ var xmlEditor = (function() {
             var utils = new Utils();
             var htmlNodePathWithoutPosition = childPath.replace(/\[\d+\]/g, "");
             var pathIndex = jQuery.inArray(htmlNodePathWithoutPosition, xpaths);
-
             var label = labels[pathIndex];
             var nodeLabelName = label;
-
             //Find following siblings with class name that starts the same way as the one removed and change
             //id and title to reflect new position
             $editButtonParent.find("ul.children > li[id='" + childPath + "']").nextAll('[data-path="' + dataPath + '"]').each(function(index) {
@@ -2372,11 +2237,8 @@ var xmlEditor = (function() {
                 utils.setPath(this, utils.getPreviousPath($(this).attr("id")), nodeLabelName); //Νεα λογική
 
             });
-
-
             //Code added to hide remove button if element cannot be removed!
             var remainingSibsCount = $(node).children(nameToDelete).length;
-
             if (parseInt(remainingSibsCount) == parseInt(minOccurs[pathIndex])) {
                 $editButtonParent.find("ul.children > li[data-path='" + dataPath + "']").each(function(index) {
                     $(this).children(".actionButtons").children("button.remove").hide();
@@ -2388,18 +2250,15 @@ var xmlEditor = (function() {
 
                     $(this).children(".actionButtons").children("button.goUp").hide();
                     $(this).children(".actionButtons").children("button.goDown").hide();
-
                 });
             }
 
 
             $childToRemove.remove();
-
             GLR.messenger.inform({
                 msg: _message["removeNodeSucess"],
                 mode: "success"
             });
-
         },
         /**
          * Removes node from XML (and from displayed HTML representation).
@@ -2483,15 +2342,12 @@ var xmlEditor = (function() {
                 msg: _message["renderingHtml"],
                 mode: "loading"
             });
-
             _self.renderAsHTML();
             _self.$container.find("ul:first").attr('id', 'lalakis').addClass("treeview");
-
             GLR.messenger.inform({
                 msg: _message["readyToEdit"],
                 mode: "success"
             });
-
         },
         /**
          * Calls methods for generating HTML representation of XML, then makes it collapsible/expandable
@@ -2510,6 +2366,5 @@ var xmlEditor = (function() {
         }
     };
     return loggable(_self, "xmlEditor");
-
 })();
 

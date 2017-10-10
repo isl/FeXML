@@ -27,13 +27,11 @@
  */
 package gr.forth.ics.isl.fexml;
 
+import gr.forth.ics.isl.fexml.utilities.Utils;
 import isl.dbms.DBFile;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -101,11 +99,14 @@ public class GetVars extends BasicServlet {
         ArrayList<String> xpaths = new ArrayList<String>();
         ArrayList<String> labels = new ArrayList<String>();
 
+                Utils utils = new Utils();
+
+        
         for (int i = 0; i < nodes.length; i++) {
-            labels.add(getMatch(nodes[i], "(?<=<lang>)[^<]+(?=</lang>)"));
+            labels.add(utils.getMatch(nodes[i], "(?<=<lang>)[^<]+(?=</lang>)"));
 
             if (labelsAndDisplayValuesOnly == null) {//get all vars
-                xpaths.add(getMatch(nodes[i], "(?<=<xpath>)[^<]+(?=</xpath>)"));
+                xpaths.add(utils.getMatch(nodes[i], "(?<=<xpath>)[^<]+(?=</xpath>)"));
             }
             minOccurs.add("" + elements.get(i).getMinOccurs());
             maxOccurs.add("" + elements.get(i).getMaxOccurs());
@@ -133,20 +134,7 @@ public class GetVars extends BasicServlet {
         }
     }
 
-    private String getMatch(String input, String pattern) {
-        String ResultString = "";
-        try {
-            Pattern Regex = Pattern.compile(pattern,
-                    Pattern.DOTALL);
-            Matcher RegexMatcher = Regex.matcher(input);
-            if (RegexMatcher.find()) {
-                ResultString = RegexMatcher.group();
-            }
-        } catch (PatternSyntaxException ex) {
-            // Syntax error in the regular expression
-        }
-        return ResultString;
-    }
+    
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**

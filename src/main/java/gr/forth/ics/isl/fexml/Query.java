@@ -27,6 +27,8 @@
  */
 package gr.forth.ics.isl.fexml;
 
+import gr.forth.ics.isl.fexml.utilities.Utils;
+import gr.forth.ics.isl.fexml.utilities.XMLFragment;
 import isl.dbms.DBCollection;
 import isl.dbms.DBFile;
 import isl.dbms.DBMSException;
@@ -71,6 +73,7 @@ public class Query extends BasicServlet {
         String xpath = request.getParameter("xpath");
         String type = request.getParameter("type");
         String vocabulary = request.getParameter("vocabulary");
+        String facet = request.getParameter("facet");
         String childrenParam = request.getParameter("children");
         String childrenPathsParam = request.getParameter("childrenPaths");
         String lang = request.getParameter("lang");
@@ -114,84 +117,126 @@ public class Query extends BasicServlet {
                 String id = request.getParameter("id");
 
                 if (vocabulary == null) {
-                    //Links code
+                    if (facet == null) {
 
-                    HashMap<String, String> queryResult = getValueFromAndType(xpath, prefix);
-                    if (queryResult == null) {
-                        result = "";
-                    } else {
-                        String selectedType = type;
+                        //Links code
+                        HashMap<String, String> queryResult = getValueFromAndType(xpath, prefix);
+                        if (queryResult == null) {
+                            result = "";
+                        } else {
+                            String selectedType = type;
 
-                        for (String entityType : queryResult.keySet()) {
-                            String valueFromXpath = queryResult.get(entityType);
-                            String typeOfValueFromXpath = entityType;
+                            for (String entityType : queryResult.keySet()) {
+                                String valueFromXpath = queryResult.get(entityType);
+                                String typeOfValueFromXpath = entityType;
 
-                            if (!typeOfValueFromXpath.equals(type)) {
-                                type = typeOfValueFromXpath;
-                            }
-
-                            StringBuilder pathCondition = new StringBuilder("[");
-                            StringBuilder pathOutput = new StringBuilder("");
-                            if (valueFromXpath.contains(",")) {
-                                String[] paths = valueFromXpath.split(",");
-                                pathOutput = pathOutput.append("concat($i//");
-
-                                for (String path : paths) {
-                                    pathCondition = pathCondition.append(path).append("!='' or");
-                                    pathOutput = pathOutput.append(path).append("/string(),', ',$i//");
-
+                                if (!typeOfValueFromXpath.equals(type)) {
+                                    type = typeOfValueFromXpath;
                                 }
-                                pathCondition = pathCondition.replace(pathCondition.length() - 2, pathCondition.length(), "]");
-                                pathOutput = pathOutput.replace(pathOutput.length() - 10, pathOutput.length(), ")");
 
-                            } else {
-                                pathCondition = pathCondition.append(valueFromXpath).append("!='']");
-                                pathOutput = pathOutput.append("$i//").append(valueFromXpath).append("/string()");
+                                StringBuilder pathCondition = new StringBuilder("[");
+                                StringBuilder pathOutput = new StringBuilder("");
+                                if (valueFromXpath.contains(",")) {
+                                    String[] paths = valueFromXpath.split(",");
+                                    pathOutput = pathOutput.append("concat($i//");
+
+                                    for (String path : paths) {
+                                        pathCondition = pathCondition.append(path).append("!='' or");
+                                        pathOutput = pathOutput.append(path).append("/string(),', ',$i//");
+
+                                    }
+                                    pathCondition = pathCondition.replace(pathCondition.length() - 2, pathCondition.length(), "]");
+                                    pathOutput = pathOutput.replace(pathOutput.length() - 10, pathOutput.length(), ")");
+
+                                } else {
+                                    pathCondition = pathCondition.append(valueFromXpath).append("!='']");
+                                    pathOutput = pathOutput.append("$i//").append(valueFromXpath).append("/string()");
+                                }
+
+                                DBCollection dbc = new DBCollection(BasicServlet.DBURI, applicationCollection + "/" + type, BasicServlet.DBuser, BasicServlet.DBpassword);
+                                String digitalPath = "";
+                                try {
+                                    digitalPath = "/" + DMSTag.valueOf("xpath", "upload", type, Query.conf)[0] + "/text()"; //exume valei sto DMSTags.xml ths exist ena neo element upload sta pedia pu xreiazetai na vazume to type sto admin part
+                                } catch (DMSException ex) {
+                                } catch (ArrayIndexOutOfBoundsException e) {
+                                }
+
+                                String query = "let $col := collection('" + applicationCollection + "/" + type + "')" + pathCondition + "[.//lang='" + lang + "']"
+                                        + "\nreturn"
+                                        + "\n<select id='" + xpath + "'>"
+                                        //     + "\n<option value='----------" + type + "----------' data-id='0' data-type='" + type + "'>----------" + type + "----------</option>"
+
+                                        + "\n<option value='--------------------' data-id='0' data-type='" + type + "'>--------------------</option>"
+                                        + "\n<optgroup label='" + type + "'>"
+                                        + "\n{for $i in $col"
+                                        + "\nlet $name := " + pathOutput
+                                        + "\nlet $imagePath := encode-for-uri($i" + digitalPath + ")"
+                                        //                                    + "\nlet $imagePath := $i//Οντότητα/ΨηφιακόΑντίγραφοΟντότητα/ΨηφιακόΑρχείο/string()"
+                                        + "\nlet $id := $i//admin/id/string()"
+                                        + "\nlet $uri := concat('.../',substring-after($i//admin/uri_id,'" + URI_Reference_Path + "'),', ')"
+                                        + "\norder by $name collation '?lang=el-gr'"
+                                        + "\nreturn";
+
+                                String returnBlock = "\n<option value='{$uri}{$name}' data-id='{$id}' image-path='{$imagePath}' data-type='" + type + "'>{$uri}{$name}</option>}";
+
+                                if (selectedType.equals(type)) {
+                                    returnBlock = "\nif ($id='" + id + "') then"
+                                            + "\n<option value='{$uri}{$name}' selected='' data-id='{$id}' image-path='{$imagePath}' data-type='" + type + "'>{$uri}{$name}</option>"
+                                            + "\nelse"
+                                            + "\n<option value='{$uri}{$name}' data-id='{$id}' image-path='{$imagePath}' data-type='" + type + "'>{$uri}{$name}</option>}";
+                                }
+
+                                returnBlock = returnBlock + "\n</optgroup>"
+                                        + "\n</select>";
+                                query = query + returnBlock;
+                                result = result + dbc.query(query)[0];
                             }
-
-                            DBCollection dbc = new DBCollection(BasicServlet.DBURI, applicationCollection + "/" + type, BasicServlet.DBuser, BasicServlet.DBpassword);
-                            String digitalPath = "";
-                            try {
-                                digitalPath = "/" + DMSTag.valueOf("xpath", "upload", type, Query.conf)[0] + "/text()"; //exume valei sto DMSTags.xml ths exist ena neo element upload sta pedia pu xreiazetai na vazume to type sto admin part
-                            } catch (DMSException ex) {
-                            } catch (ArrayIndexOutOfBoundsException e) {
-                            }
-
-                            String query = "let $col := collection('" + applicationCollection + "/" + type + "')" + pathCondition + "[.//lang='" + lang + "']"
-                                    + "\nreturn"
-                                    + "\n<select id='" + xpath + "'>"
-                                    //     + "\n<option value='----------" + type + "----------' data-id='0' data-type='" + type + "'>----------" + type + "----------</option>"
-
-                                    + "\n<option value='--------------------' data-id='0' data-type='" + type + "'>--------------------</option>"
-                                    + "\n<optgroup label='" + type + "'>"
-                                    + "\n{for $i in $col"
-                                    + "\nlet $name := " + pathOutput
-                                    + "\nlet $imagePath := encode-for-uri($i" + digitalPath + ")"
-                                    //                                    + "\nlet $imagePath := $i//Οντότητα/ΨηφιακόΑντίγραφοΟντότητα/ΨηφιακόΑρχείο/string()"
-                                    + "\nlet $id := $i//admin/id/string()"
-                                    + "\nlet $uri := concat('.../',substring-after($i//admin/uri_id,'" + URI_Reference_Path + "'),', ')"
-                                    + "\norder by $name collation '?lang=el-gr'"
-                                    + "\nreturn";
-
-                            String returnBlock = "\n<option value='{$uri}{$name}' data-id='{$id}' image-path='{$imagePath}' data-type='" + type + "'>{$uri}{$name}</option>}";
-
-                            if (selectedType.equals(type)) {
-                                returnBlock = "\nif ($id='" + id + "') then"
-                                        + "\n<option value='{$uri}{$name}' selected='' data-id='{$id}' image-path='{$imagePath}' data-type='" + type + "'>{$uri}{$name}</option>"
-                                        + "\nelse"
-                                        + "\n<option value='{$uri}{$name}' data-id='{$id}' image-path='{$imagePath}' data-type='" + type + "'>{$uri}{$name}</option>}";
-                            }
-
-                            returnBlock = returnBlock + "\n</optgroup>"
-                                    + "\n</select>";
-                            query = query + returnBlock;
-                            result = result + dbc.query(query)[0];
+                            result = result.replaceAll("(?s)</select><select[^>]+>[^<]+.*?(?=<optgroup)", "");
                         }
-                        result = result.replaceAll("(?s)</select><select[^>]+>[^<]+.*?(?=<optgroup)", "");
+                    } else {//Facet code
+                        String facetProps = getFacetProperties(xpath, prefix);
+                        Utils utils = new Utils();
+
+                        String themasURL = utils.getMatch(facetProps, "(?<=themasUrl=\")[^\"]*(?=\")");
+                        String username = utils.getMatch(facetProps, "(?<=username=\")[^\"]*(?=\")");
+                        String thesaurusName = utils.getMatch(facetProps, "(?<=thesaurusName=\")[^\"]*(?=\")");
+                        String refId = utils.getMatch(facetProps, "(?<=refId=\")[^\"]*(?=\")");
+
+                        String urlEnd = "&external_user=" + username + "&external_thesaurus=" + thesaurusName;
+
+                        String serviceURL = themasURL + "SearchResults_Terms?updateTermCriteria=parseCriteria"
+                                + "&answerType=XMLSTREAM&pageFirstResult=SaveAll&input_term=facet&op_term=refid=&inputvalue_term=" + refId
+                                + "&operator_term=or&output_term1=name" + urlEnd;
+
+                        String themasServiceResponse = utils.consumeService(serviceURL);
+
+                        if (themasServiceResponse.length() > 0) {
+                            XMLFragment xml = new XMLFragment(themasServiceResponse);
+                            ArrayList<String> terms = xml.query("//term/descriptor/text()");
+                            ArrayList<String> Ids = xml.query("//term/descriptor/@referenceId");
+
+                            StringBuilder selectBlock = new StringBuilder(" <select id='" + xpath + "' data-facet='" + refId + "'>");
+                            selectBlock.append("<option value='-------------------' data-id='0'>-------------------</option>");
+
+                            for (int i = 0; i < terms.size(); i++) {
+
+                                if (Ids.get(i).equals(id)) {
+                                    selectBlock.append("<option selected='' value='" + terms.get(i) + "' data-id='" + Ids.get(i) + "'>" + terms.get(i) + "</option>");
+
+                                } else {
+                                    selectBlock.append("<option value='" + terms.get(i) + "' data-id='" + Ids.get(i) + "'>" + terms.get(i) + "</option>");
+                                }
+                            }
+                            selectBlock.append("</select>");
+                            result = selectBlock.toString();
+
+                        } else {
+                            result = "No facet found!";
+                        }
+
                     }
                 } else {
                     //Vocabulary code
-
                     if (vocabulary.equals("")) {
                         vocabulary = getVocabulary(xpath, prefix);
                     }
@@ -519,6 +564,32 @@ public class Query extends BasicServlet {
 
         if (vocabsTable != null && vocabsTable.length > 0) {
             return vocabsTable[0];
+        } else {
+            return null;
+        }
+    }
+
+    private String getFacetProperties(String xpath, String prefix) {
+        DBCollection nodesCol = new DBCollection(BasicServlet.DBURI, applicationCollection + "/LaAndLi", BasicServlet.DBuser, BasicServlet.DBpassword);
+
+        xpath = xpath.replaceAll("\\[\\d++\\]", "");
+        //Should be only one?
+        String[] facetsTable = nodesCol.query("//node[xpath='" + xpath + "']/facet");
+        if (facetsTable == null || facetsTable.length == 0) {
+
+            //If no info in LaAndLi collection, then try querying legacy data
+            //TO CHECK
+            DBCollection rootCol = new DBCollection(BasicServlet.DBURI, applicationCollection, BasicServlet.DBuser, BasicServlet.DBpassword);
+            facetsTable = rootCol.query("//" + xpath + "/@" + prefix + "_facet");
+            if (facetsTable != null && facetsTable.length > 0) {
+                System.out.println("XPATH=" + xpath);
+                System.out.println("FT[0]=" + facetsTable[0]);
+//                nodesCol.xUpdate("//node[xpath='" + xpath + "']/facet", facetsTable[0]);
+            }
+        }
+
+        if (facetsTable != null && facetsTable.length > 0) {
+            return facetsTable[0];
         } else {
             return null;
         }

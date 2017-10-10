@@ -31,15 +31,23 @@ import isl.dbms.DBFile;
 import isl.dms.DMSException;
 import isl.dms.file.DMSTag;
 import gr.forth.ics.isl.fexml.BasicServlet;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.StringReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.DecimalFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import javax.xml.parsers.DocumentBuilder;
@@ -55,6 +63,53 @@ import org.xml.sax.SAXException;
  * @author samarita
  */
 public class Utils {
+
+    public String consumeService(String urlString) {
+        try {
+
+            URL url = new URL(urlString);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            conn.setRequestProperty("Accept", "application/xml");
+
+            conn.setRequestProperty("Encoding", "UTF-8");
+
+            if (conn.getResponseCode() != 200) {
+                throw new RuntimeException("Failed : HTTP error code : "
+                        + conn.getResponseCode());
+            }
+            String output = "";
+
+            BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
+            output = org.apache.commons.io.IOUtils.toString(br);
+
+            conn.disconnect();
+            return output;
+
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+            return e.getMessage();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return e.getMessage();
+
+        }
+    }
+
+    public String getMatch(String input, String pattern) {
+        String ResultString = "";
+        try {
+            Pattern Regex = Pattern.compile(pattern,
+                    Pattern.DOTALL);
+            Matcher RegexMatcher = Regex.matcher(input);
+            if (RegexMatcher.find()) {
+                ResultString = RegexMatcher.group();
+            }
+        } catch (PatternSyntaxException ex) {
+            // Syntax error in the regular expression
+        }
+        return ResultString;
+    }
 
     public String getDate() {
 

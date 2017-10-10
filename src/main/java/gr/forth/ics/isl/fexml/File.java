@@ -249,7 +249,7 @@ public class File extends BasicServlet {
                     template = sch.createXMLSubtree(type, "medium");
                 } else {
                     legacyMode = true;
-                    template = sch.createXMLSubtree("Οντότητα", "maximun");
+                    template = sch.createXMLSubtree("Οντότητα", "maximum");
                 }
 
                 String[] res = this.initInsertFile(type);

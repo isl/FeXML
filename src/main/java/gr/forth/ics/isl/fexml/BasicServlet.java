@@ -637,7 +637,7 @@ public class BasicServlet extends HttpServlet {
     public static int getLastId(DBCollection col) {
         int id = 0;
         try {
-            String queryString = "let $results := for $i in //id/text() return $i,$maximun:=max($results)return $maximun";
+            String queryString = "let $results := for $i in //id/text() return $i,$maximum:=max($results)return $maximum";
             String[] dbf = col.query(queryString);
             if (dbf.length != 0) {
                 String idString = dbf[0].toString();

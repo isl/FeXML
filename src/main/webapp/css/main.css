@@ -540,7 +540,7 @@ input.list
     color: #000;
     font: 12px consolas,courier new,monospace;
 }
-button#voc, button.go
+button#voc, button.go, button#th
 {
     margin-bottom: 10px;
     margin-left: 4px;

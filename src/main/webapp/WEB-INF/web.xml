@@ -295,6 +295,10 @@ This file is part of the FeXML webapp.
         <servlet-name>GetVars</servlet-name>
         <servlet-class>gr.forth.ics.isl.fexml.GetVars</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>Service</servlet-name>
+        <servlet-class>gr.forth.ics.isl.fexml.Service</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>Index</servlet-name>
         <url-pattern>/Index</url-pattern>
@@ -334,6 +338,10 @@ This file is part of the FeXML webapp.
     <servlet-mapping>
         <servlet-name>GetVars</servlet-name>
         <url-pattern>/GetVars</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Service</servlet-name>
+        <url-pattern>/Service</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

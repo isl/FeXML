@@ -2189,16 +2189,20 @@ var xmlEditor = (function() {
                         $valueWrap.hide().parent().append($field).append(voc).append($btnWrap);
                     });
                 });
-            } else if (mode==="thesaurus") {
+            } else if (mode === "thesaurus") {
                 $btnTh.click(function() {
                     var select = $(this).parent().parent()[0].getElementsByTagName("select")[0];
                     value = $field.val();
-                    var id = select.options[select.selectedIndex].getAttribute("data-id");
-                    if (id > 0) {
-                        var type = select.options[select.selectedIndex].getAttribute("data-type");
-                        var popUpURL = document.URL.replace(/type=([^&]+)/g, "type=" + type);
-//                        popUpURL = popUpURL.replace(/id=([^&]+)/g, "id=" + id);
-popUpURL = "http://139.91.183.97:8080/THEMAS/hierarchysTermsShortcuts?action=GlobalThesarusHierarchical&answerType=XMLSTREAM&external_user=ExternalReader&external_thesaurus=TESTDATA";
+                    var selectedValueId = select.options[select.selectedIndex].getAttribute("data-id");
+
+                    var thesaurusName = select.getAttribute("data-thesaurusName");
+                    var username = select.getAttribute("data-username");
+                    var themasURL = select.getAttribute("data-themasURL");
+                    var facet = select.getAttribute("data-facet");
+
+
+                    if (selectedValueId >= 0) {
+                        var popUpURL = "Service?themasURL=" + themasURL + "&username=" + username + "&thesaurusName=" + thesaurusName + "&facetId=" + facet + "&termId=" + selectedValueId;
                         centeredPopup(popUpURL, 'myWindow', '700', '500', 'yes');
                     }
                 });

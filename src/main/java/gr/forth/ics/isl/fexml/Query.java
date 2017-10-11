@@ -200,12 +200,12 @@ public class Query extends BasicServlet {
                         String themasURL = utils.getMatch(facetProps, "(?<=themasUrl=\")[^\"]*(?=\")");
                         String username = utils.getMatch(facetProps, "(?<=username=\")[^\"]*(?=\")");
                         String thesaurusName = utils.getMatch(facetProps, "(?<=thesaurusName=\")[^\"]*(?=\")");
-                        String refId = utils.getMatch(facetProps, "(?<=refId=\")[^\"]*(?=\")");
+                        String facetId = utils.getMatch(facetProps, "(?<=facetId=\")[^\"]*(?=\")");
 
                         String urlEnd = "&external_user=" + username + "&external_thesaurus=" + thesaurusName;
 
                         String serviceURL = themasURL + "SearchResults_Terms?updateTermCriteria=parseCriteria"
-                                + "&answerType=XMLSTREAM&pageFirstResult=SaveAll&input_term=facet&op_term=refid=&inputvalue_term=" + refId
+                                + "&answerType=XMLSTREAM&pageFirstResult=SaveAll&input_term=facet&op_term=refid=&inputvalue_term=" + facetId
                                 + "&operator_term=or&output_term1=name" + urlEnd;
 
                         String themasServiceResponse = utils.consumeService(serviceURL);
@@ -215,7 +215,7 @@ public class Query extends BasicServlet {
                             ArrayList<String> terms = xml.query("//term/descriptor/text()");
                             ArrayList<String> Ids = xml.query("//term/descriptor/@referenceId");
 
-                            StringBuilder selectBlock = new StringBuilder(" <select id='" + xpath + "' data-facet='" + refId + "'>");
+                            StringBuilder selectBlock = new StringBuilder(" <select id='" + xpath + "' data-thesaurusName='"+thesaurusName+"' data-username='"+username+"' data-themasURL='"+themasURL+"' data-facet='" + facetId + "'>");
                             selectBlock.append("<option value='-------------------' data-id='0'>-------------------</option>");
 
                             for (int i = 0; i < terms.size(); i++) {

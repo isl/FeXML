@@ -404,12 +404,23 @@ function centeredPopup(url, winName, w, h, scroll) {
 
     popupWindow = window.open(url, winName, settings)
     if (window.focus) {
-        popupWindow.focus()
+        popupWindow.focus();
     }
 
     if (!popupWindow.closed) {
-        popupWindow.focus()
+        popupWindow.focus();
     }
+}
+function getValueFromPopUp(value) {
+    var $select = $('select');
+    var newValue = $select.find('option[data-id=' + value + ']').attr("value");
+    $select.val(newValue).trigger("liszt:updated");
+    $select.find('option[data-id=' + value + ']').attr('selected', 'selected');
+}
+function changeTerm(term) {
+    var $term = $(term);
+    $("span").removeClass("selected");
+    $term.parent().addClass("selected");
 }
 
 function trim(str) {
@@ -575,7 +586,7 @@ function loadVars(type) {
         }
 
         if (typeof (labels) === "undefined") {
-           
+
             if ($("#dynamicLabels").val() !== "on") { //Labels do not change all the time, so local storage can be used
                 //Check for specific language
                 if (!localStorage[schemaName + "." + lang + ".labels"]) { //If labels are missing, then get them and displayValues!
@@ -694,8 +705,8 @@ function createMap() {
                 '<div class="' + divClassName + '"  onclick="toggleNode(this);"></div>' +
                 '<span class="nodeName" onclick="goTo(' + linkId + ',' + xpath + ');return false;">' + labels[i] + '</span>';
         //var dynamicLabels = $("#dynamicLabels").val();
-      
-        if ($("#dynamicLabels").val() === "on" && view==='2') {
+
+        if ($("#dynamicLabels").val() === "on" && view === '2') {
             var displayButton;
             if (displayValues[i] === "visible") {
                 displayButton = '<button id="hide' + i + '" onclick="toggleDisplay(this,' + i + ');" style="opacity: 0.5;" class="edit icon" title="' + _message["hide"] + '">' +
@@ -835,15 +846,15 @@ function detectRecursion(nodePath) {
             path = path + "/" + pathComponents[i] + "/";
 
         } else {
-            if (path.indexOf("/"+pathComponents[i]+"/") === -1) {
+            if (path.indexOf("/" + pathComponents[i] + "/") === -1) {
                 path = path + pathComponents[i] + "/";
             } else {
                 var index = path.indexOf("/" + pathComponents[i] + "/") + pathComponents[i].length + 2;
-                 path = path.substring(0, index);
+                path = path.substring(0, index);
             }
         }
     }
-            return path.substring(1, path.length - 1);
+    return path.substring(1, path.length - 1);
 }
 
 function labelChange(but, pathIndex) {

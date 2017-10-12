@@ -201,37 +201,40 @@ public class Query extends BasicServlet {
                         String username = utils.getMatch(facetProps, "(?<=username=\")[^\"]*(?=\")");
                         String thesaurusName = utils.getMatch(facetProps, "(?<=thesaurusName=\")[^\"]*(?=\")");
                         String facetId = utils.getMatch(facetProps, "(?<=facetId=\")[^\"]*(?=\")");
+                        System.out.println("FACET ID is:" + facetId);
+                        if (!facetId.equals("")) {                          
 
-                        String urlEnd = "&external_user=" + username + "&external_thesaurus=" + thesaurusName;
+                            String urlEnd = "&external_user=" + username + "&external_thesaurus=" + thesaurusName;
 
-                        String serviceURL = themasURL + "SearchResults_Terms?updateTermCriteria=parseCriteria"
-                                + "&answerType=XMLSTREAM&pageFirstResult=SaveAll&input_term=facet&op_term=refid=&inputvalue_term=" + facetId
-                                + "&operator_term=or&output_term1=name" + urlEnd;
+                            String serviceURL = themasURL + "SearchResults_Terms?updateTermCriteria=parseCriteria"
+                                    + "&answerType=XMLSTREAM&pageFirstResult=SaveAll&input_term=facet&op_term=refid=&inputvalue_term=" + facetId
+                                    + "&operator_term=or&output_term1=name" + urlEnd;
 
-                        String themasServiceResponse = utils.consumeService(serviceURL);
+                            String themasServiceResponse = utils.consumeService(serviceURL);
 
-                        if (themasServiceResponse.length() > 0) {
-                            XMLFragment xml = new XMLFragment(themasServiceResponse);
-                            ArrayList<String> terms = xml.query("//term/descriptor/text()");
-                            ArrayList<String> Ids = xml.query("//term/descriptor/@referenceId");
+                            if (themasServiceResponse.length() > 0) {
+                                XMLFragment xml = new XMLFragment(themasServiceResponse);
+                                ArrayList<String> terms = xml.query("//term/descriptor/text()");
+                                ArrayList<String> Ids = xml.query("//term/descriptor/@referenceId");
 
-                            StringBuilder selectBlock = new StringBuilder(" <select id='" + xpath + "' data-thesaurusName='"+thesaurusName+"' data-username='"+username+"' data-themasURL='"+themasURL+"' data-facet='" + facetId + "'>");
-                            selectBlock.append("<option value='-------------------' data-id='0'>-------------------</option>");
+                                StringBuilder selectBlock = new StringBuilder(" <select id='" + xpath + "' data-thesaurusName='" + thesaurusName + "' data-username='" + username + "' data-themasURL='" + themasURL + "' data-facet='" + facetId + "'>");
+                                selectBlock.append("<option value='-------------------' data-id='0'>-------------------</option>");
 
-                            for (int i = 0; i < terms.size(); i++) {
+                                for (int i = 0; i < terms.size(); i++) {
 
-                                if (Ids.get(i).equals(id)) {
-                                    selectBlock.append("<option selected='' value='" + terms.get(i) + "' data-id='" + Ids.get(i) + "'>" + terms.get(i) + "</option>");
+                                    if (Ids.get(i).equals(id)) {
+                                        selectBlock.append("<option selected='' value='" + terms.get(i) + "' data-id='" + Ids.get(i) + "'>" + terms.get(i) + "</option>");
 
-                                } else {
-                                    selectBlock.append("<option value='" + terms.get(i) + "' data-id='" + Ids.get(i) + "'>" + terms.get(i) + "</option>");
+                                    } else {
+                                        selectBlock.append("<option value='" + terms.get(i) + "' data-id='" + Ids.get(i) + "'>" + terms.get(i) + "</option>");
+                                    }
                                 }
-                            }
-                            selectBlock.append("</select>");
-                            result = selectBlock.toString();
+                                selectBlock.append("</select>");
+                                result = selectBlock.toString();
 
-                        } else {
-                            result = "No facet found!";
+                            } else {
+                                result = "No facet found!";
+                            }
                         }
 
                     }

@@ -139,6 +139,7 @@ var xmlEditor = (function() {
             "xmlLoadSuccess": "Το XML αρχείο άνοιξε επιτυχώς.",
             "xmlLoadProblem": "Υπήρξε πρόβλημα στο άνοιγμα του XML αρχείου.",
             "noVocabFound": "Δε βρέθηκε το αντίστοιχο λεξιλόγιο.",
+            "noFacetFound": "Δεν έχει οριστεί συγκεκριμένο facet.",
             "schemaCheckFailed": "Η σύνδεση με το Schema απέτυχε",
             "validatingXml": "Έλεγχος XML ...",
             "referencesEval": "Δημιουργία Αναφορών ...",
@@ -195,6 +196,7 @@ var xmlEditor = (function() {
             "xmlLoadSuccess": "XML file loaded successfully.",
             "xmlLoadProblem": "A problem came up while loading the XML file.",
             "noVocabFound": "Vocabulary not found.",
+            "noFacetFound": "Facet not yet specified.",
             "schemaCheckFailed": "Schema connection failed",
             "validatingXml": "Validating XML ...",
             "referencesEval": "Create references ...",
@@ -250,6 +252,7 @@ var xmlEditor = (function() {
             "xmlLoadSuccess": "XML file loaded successfully.",
             "xmlLoadProblem": "A problem came up while loading the XML file.",
             "noVocabFound": "Vocabulary not found.",
+            "noFacetFound": "Facet not yet specified.",
             "schemaCheckFailed": "Schema connection failed",
             "validatingXml": "Validating XML ...",
             "referencesEval": "Create references ...",
@@ -659,21 +662,23 @@ var xmlEditor = (function() {
                                     }
                                 }, "html")
                             } else if (node.getAttributeNode("sps_facet")) {
-                                $.post("Query", {
-                                    facet: node.getAttribute("sps_facet"),
-                                    xpath: _get_XPath(node),
-                                    lang: _lang,
-                                    prefix: "sps",
-                                    id: node.getAttribute("sps_id")
-                                }, function(response) {
-                                    if (response.indexOf("<select") > -1) {
-                                        var mode = "thesaurus";
-                                        _self.editValueSelect($this, node, response, mode, "sps");
-                                    }
-                                    else {
-                                        alert(_message["noVocabFound"]);
-                                    }
-                                }, "html")
+                                
+                                    $.post("Query", {
+                                        facet: node.getAttribute("sps_facet"),
+                                        xpath: _get_XPath(node),
+                                        lang: _lang,
+                                        prefix: "sps",
+                                        id: node.getAttribute("sps_id")
+                                    }, function(response) {
+                                        if (response.indexOf("<select") > -1) {
+                                            var mode = "thesaurus";
+                                            _self.editValueSelect($this, node, response, mode, "sps");
+                                        }
+                                        else {
+                                            alert(_message["linkFailed"]);
+                                        }
+                                    }, "html")
+                                
                             } else if (node.getAttributeNode("ics_html") || node.getAttributeNode("sps_html")) {
                                 _self.editValue($this, node, _getNodeValue(node), true, "");
                             } else if (node.getAttributeNode("sps_browse")) {
@@ -2090,7 +2095,7 @@ var xmlEditor = (function() {
                     _self.setAttribute(node, prefix + "_type", type);
                 } else if (mode === "thesaurus") {
                     facet = select.getAttribute("data-facet");
-                    _self.setAttribute(node, prefix + "_facet", facet);
+//                    _self.setAttribute(node, prefix + "_facet", facet); //Not needed, facet is in LaAndLi
                 } else {
                     vocabulary = select.getAttribute("data-vocabulary");
                     _self.setAttribute(node, prefix + "_vocabulary", vocabulary);

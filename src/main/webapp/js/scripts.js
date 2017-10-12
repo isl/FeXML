@@ -402,7 +402,7 @@ function centeredPopup(url, winName, w, h, scroll) {
         winName = "window_" + winName.length;
     }
 
-    popupWindow = window.open(url, winName, settings)
+    popupWindow = window.open(url, winName, settings);
     if (window.focus) {
         popupWindow.focus();
     }

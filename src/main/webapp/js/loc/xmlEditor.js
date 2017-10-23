@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2015 Institute of Computer Science,
+ * Copyright 2012-2017 Institute of Computer Science,
  * Foundation for Research and Technology - Hellas
  *
  * Licensed under the EUPL, Version 1.1 or - as soon they will be approved
@@ -384,8 +384,13 @@ var xmlEditor = (function() {
             }
             /* Code added to overcome recursion issues END*/
 
-            if (xpaths[pathIndex + 1].lastIndexOf(xpaths[pathIndex], 0) === 0) {
-                return false;
+            if (xpaths[pathIndex + 1].lastIndexOf(xpaths[pathIndex], 0) === 0) {//has children
+                //Now we must determine if children are editable, ie if we may add or delete them.                
+                if (_hasOptionalOrMultipleChildren(xpath)) {
+                    return false;
+                } else {//If node children are neither optional nor multiple, there is no point in showing cog, so we treat node as a leaf.
+                    return true;
+                }
             } else {
                 return true;
             }
@@ -393,7 +398,27 @@ var xmlEditor = (function() {
 
 
     }
+    /**
+     * Checks if a node with a specific xpath has either optional or multiple children
+     * @param 	{fatherXpath}	father node xpath
+     * @return 	{String}
+     */
 
+    function _hasOptionalOrMultipleChildren(fatherXpath) {
+        for (var i = 1; i < xpaths.length; i++) {//exclude root
+            var xpath = xpaths[i];
+
+            var pathWithoutFather = xpath.replace(fatherXpath + "/", "");
+            if (pathWithoutFather.indexOf("/") === -1) {
+                if (minOccurs[i] === "0" || maxOccurs[i] === "-1") {
+//                    console.log("CHILD FOUND=" + pathWithoutFather + "##" + minOccurs[i] + "##" + maxOccurs[i]);
+                    return true;
+                }
+//                console.log("CHILD FOUND="+pathWithoutFather+"##"+minOccurs[i]+"##"+maxOccurs[i]);
+            }
+        }
+        return false;
+    }
 
     /**
      * Binds custom event to private _$event object
@@ -662,23 +687,23 @@ var xmlEditor = (function() {
                                     }
                                 }, "html")
                             } else if (node.getAttributeNode("sps_facet")) {
-                                
-                                    $.post("Query", {
-                                        facet: node.getAttribute("sps_facet"),
-                                        xpath: _get_XPath(node),
-                                        lang: _lang,
-                                        prefix: "sps",
-                                        id: node.getAttribute("sps_id")
-                                    }, function(response) {
-                                        if (response.indexOf("<select") > -1) {
-                                            var mode = "thesaurus";
-                                            _self.editValueSelect($this, node, response, mode, "sps");
-                                        }
-                                        else {
-                                            alert(_message["linkFailed"]);
-                                        }
-                                    }, "html")
-                                
+
+                                $.post("Query", {
+                                    facet: node.getAttribute("sps_facet"),
+                                    xpath: _get_XPath(node),
+                                    lang: _lang,
+                                    prefix: "sps",
+                                    id: node.getAttribute("sps_id")
+                                }, function(response) {
+                                    if (response.indexOf("<select") > -1) {
+                                        var mode = "thesaurus";
+                                        _self.editValueSelect($this, node, response, mode, "sps");
+                                    }
+                                    else {
+                                        alert(_message["linkFailed"]);
+                                    }
+                                }, "html")
+
                             } else if (node.getAttributeNode("ics_html") || node.getAttributeNode("sps_html")) {
                                 _self.editValue($this, node, _getNodeValue(node), true, "");
                             } else if (node.getAttributeNode("sps_browse")) {
@@ -1085,8 +1110,9 @@ var xmlEditor = (function() {
                         '<div class="hitarea' + (isLast ? ' last' : '') + '"/>';
                 var spanStyle = "";
                 var editButtonHtml = "";
-                if (!_isLeaf(pathIndex) && view != 1) {
-
+                if (!_isLeaf(pathIndex) && view !== 1) {
+                    console.log(pathIndex);
+                    console.log(xpaths[pathIndex])
                     spanStyle = 'style="vertical-align:top"';
                     editButtonHtml = '<button class="edit icon" title="' + _message["addRemove"] + '"><img  style="vertical-align:top" src="css/addRemove.png"/></button>&nbsp;';
                 }
@@ -1209,7 +1235,7 @@ var xmlEditor = (function() {
                 }
                 removeButtonHtml = '<button class="remove icon ' + removeButtonStyle + '" title="' + _message["remove"] + '"><img  style="vertical-align:top" src="css/remove.png"/></button>';
             }
-            return  goUpButtonHtml + goDownButtonHtml + addButtonHtml + removeButtonHtml;
+            return   addButtonHtml + removeButtonHtml + goUpButtonHtml + goDownButtonHtml;
         },
         /**
          * Renders XML as an HTML structure. Uses _traverseDOM() to render each node.

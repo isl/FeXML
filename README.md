@@ -1,4 +1,4 @@
-Copyright 2012-2015 Institute of Computer Science,
+Copyright 2012-2017 Institute of Computer Science,
 Foundation for Research and Technology - Hellas
 
 Licensed under the EUPL, Version 1.1 or - as soon they will be approved

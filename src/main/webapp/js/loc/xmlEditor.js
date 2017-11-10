@@ -362,18 +362,20 @@ var xmlEditor = (function() {
 
     /**
      * Replaced old _isLeaf. Works much better, since it considers the actual xsd and not a single xml instance.
-     * @param 	{Object}	node	A DOM element
-     * @return 	{String}
+     * 
+     * @param 	{Int}	pathIndex   Xpath indexOf xpaths table.
+     * @return 	{String}        'Leaf' if leaf. 'ParentWithActions' if parent with children that you may mess with.
+     *                          'ParentWithoutActions' if parent with children that you may not mess with. 
      */
 
-    function _isLeaf(pathIndex) {
+    function _getNodeType(pathIndex) {
 
         if (pathIndex === -1) {
-            return true;
+            return "Leaf";
         }
 
         if (xpaths.length === pathIndex + 1) {
-            return true;
+            return "Leaf";
         } else {
 
             /*START Code added to overcome recursion issues */
@@ -387,12 +389,12 @@ var xmlEditor = (function() {
             if (xpaths[pathIndex + 1].lastIndexOf(xpaths[pathIndex], 0) === 0) {//has children
                 //Now we must determine if children are editable, ie if we may add or delete them.                
                 if (_hasOptionalOrMultipleChildren(xpath)) {
-                    return false;
+                    return "ParentWithActions";
                 } else {//If node children are neither optional nor multiple, there is no point in showing cog, so we treat node as a leaf.
-                    return true;
+                    return "ParentWithoutActions";
                 }
             } else {
-                return true;
+                return "Leaf";
             }
         }
 
@@ -1110,20 +1112,18 @@ var xmlEditor = (function() {
                         '<div class="hitarea' + (isLast ? ' last' : '') + '"/>';
                 var spanStyle = "";
                 var editButtonHtml = "";
-                if (!_isLeaf(pathIndex) && view !== 1) {
-                    console.log(pathIndex);
-                    console.log(xpaths[pathIndex])
+                if (_getNodeType(pathIndex) === "ParentWithActions" && view !== 1) {
+
                     spanStyle = 'style="vertical-align:top"';
                     editButtonHtml = '<button class="edit icon" title="' + _message["addRemove"] + '"><img  style="vertical-align:top" src="css/addRemove.png"/></button>&nbsp;';
                 }
-
 
                 nodeHtml = nodeHtml + '<span ' + spanStyle + ' class="nodeName">' + label + '</span>' + nodeAttrs + editButtonHtml;
                 if (view != 1) {
                     nodeHtml = nodeHtml + "<span class='actionButtons'>" + _self.createAllowedActions(node, pathIndex, nodePath) + "</span>";
                 } else {
                     nodeValueStr = (nodeValue) ? nodeValue : "<span class='noValue'>" + _message["noTextValueNoEdit"] + "</span>";
-                    if (!_isLeaf(pathIndex))
+                    if (_getNodeType(pathIndex) === "ParentWithActions") //works?
                         return  nodeHtml + '</li>';
                 }
                 if (node.getAttributeNode("ics_browse")) {
@@ -1178,8 +1178,9 @@ var xmlEditor = (function() {
                     nodeValueClass = "nodeFixed";
                 }
 
+              
 
-                if (_isLeaf(pathIndex)) {
+                if (_getNodeType(pathIndex)==="Leaf") {
                     nodeHtml = nodeHtml + '<ul class="nodeCore">' +
                             '<li><p class="' + nodeValueClass + '">' + nodeValueStr + '</p></li>' +
                             '</ul>';

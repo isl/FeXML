@@ -386,7 +386,12 @@ var xmlEditor = (function() {
             }
             /* Code added to overcome recursion issues END*/
 
+
             if (xpaths[pathIndex + 1].lastIndexOf(xpaths[pathIndex], 0) === 0) {//has children
+                
+                if (view==="1") {//If view mode, then there is no point in looking for optional or multiple children.
+                    return "Parent";
+                } 
                 //Now we must determine if children are editable, ie if we may add or delete them.                
                 if (_hasOptionalOrMultipleChildren(xpath)) {
                     return "ParentWithActions";
@@ -1112,19 +1117,22 @@ var xmlEditor = (function() {
                         '<div class="hitarea' + (isLast ? ' last' : '') + '"/>';
                 var spanStyle = "";
                 var editButtonHtml = "";
-                if (_getNodeType(pathIndex) === "ParentWithActions" && view !== 1) {
+                if (view !== "1") {
+                    if (_getNodeType(pathIndex) === "ParentWithActions") {
 
-                    spanStyle = 'style="vertical-align:top"';
-                    editButtonHtml = '<button class="edit icon" title="' + _message["addRemove"] + '"><img  style="vertical-align:top" src="css/addRemove.png"/></button>&nbsp;';
+                        spanStyle = 'style="vertical-align:top"';
+                        editButtonHtml = '<button class="edit icon" title="' + _message["addRemove"] + '"><img  style="vertical-align:top" src="css/addRemove.png"/></button>&nbsp;';
+                    }
                 }
 
                 nodeHtml = nodeHtml + '<span ' + spanStyle + ' class="nodeName">' + label + '</span>' + nodeAttrs + editButtonHtml;
-                if (view != 1) {
+                if (view !== "1") {
                     nodeHtml = nodeHtml + "<span class='actionButtons'>" + _self.createAllowedActions(node, pathIndex, nodePath) + "</span>";
                 } else {
                     nodeValueStr = (nodeValue) ? nodeValue : "<span class='noValue'>" + _message["noTextValueNoEdit"] + "</span>";
-                    if (_getNodeType(pathIndex) === "ParentWithActions") //works?
+                    if (_getNodeType(pathIndex) === "ParentWithActions") { //works?
                         return  nodeHtml + '</li>';
+                    }
                 }
                 if (node.getAttributeNode("ics_browse")) {
 
@@ -1178,9 +1186,9 @@ var xmlEditor = (function() {
                     nodeValueClass = "nodeFixed";
                 }
 
-              
 
-                if (_getNodeType(pathIndex)==="Leaf") {
+
+                if (_getNodeType(pathIndex) === "Leaf") {
                     nodeHtml = nodeHtml + '<ul class="nodeCore">' +
                             '<li><p class="' + nodeValueClass + '">' + nodeValueStr + '</p></li>' +
                             '</ul>';

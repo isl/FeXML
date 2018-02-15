@@ -381,7 +381,9 @@ var xmlEditor = (function() {
             /*START Code added to overcome recursion issues */
             var xpath = xpaths[pathIndex];
             var xpathWithoutRecursion = detectRecursion(xpath);
-            if (xpath !== xpathWithoutRecursion) {
+
+            if (xpath !== xpathWithoutRecursion) {//&& xpathWithoutRecursion!=='Essay'
+               
                 pathIndex = jQuery.inArray(xpathWithoutRecursion, xpaths);
             }
             /* Code added to overcome recursion issues END*/

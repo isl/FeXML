@@ -136,21 +136,24 @@ public class Query extends BasicServlet {
 
                                 StringBuilder pathCondition = new StringBuilder("[");
                                 StringBuilder pathOutput = new StringBuilder("");
+
+                                //Experimental:Changed pathOutput from // to / (Zominthos)
                                 if (valueFromXpath.contains(",")) {
                                     String[] paths = valueFromXpath.split(",");
-                                    pathOutput = pathOutput.append("concat($i//");
+                                    pathOutput = pathOutput.append("concat($i/");
 
                                     for (String path : paths) {
+
                                         pathCondition = pathCondition.append(path).append("!='' or");
-                                        pathOutput = pathOutput.append(path).append("/string(),', ',$i//");
+                                        pathOutput = pathOutput.append(path.trim()).append("/string(),', ',$i/");
 
                                     }
                                     pathCondition = pathCondition.replace(pathCondition.length() - 2, pathCondition.length(), "]");
-                                    pathOutput = pathOutput.replace(pathOutput.length() - 10, pathOutput.length(), ")");
+                                    pathOutput = pathOutput.replace(pathOutput.length() - 9, pathOutput.length(), ")");//was 10 with //
 
                                 } else {
                                     pathCondition = pathCondition.append(valueFromXpath).append("!='']");
-                                    pathOutput = pathOutput.append("$i//").append(valueFromXpath).append("/string()");
+                                    pathOutput = pathOutput.append("$i/").append(valueFromXpath).append("/string()");
                                 }
 
                                 DBCollection dbc = new DBCollection(BasicServlet.DBURI, applicationCollection + "/" + type, BasicServlet.DBuser, BasicServlet.DBpassword);
@@ -177,6 +180,7 @@ public class Query extends BasicServlet {
                                         + "\norder by $name collation '?lang=el-gr'"
                                         + "\nreturn";
 
+
                                 String returnBlock = "\n<option value='{$uri}{$name}' data-id='{$id}' image-path='{$imagePath}' data-type='" + type + "'>{$uri}{$name}</option>}";
 
                                 if (selectedType.equals(type)) {
@@ -202,7 +206,7 @@ public class Query extends BasicServlet {
                         String thesaurusName = utils.getMatch(facetProps, "(?<=thesaurusName=\")[^\"]*(?=\")");
                         String facetId = utils.getMatch(facetProps, "(?<=facetId=\")[^\"]*(?=\")");
                         System.out.println("FACET ID is:" + facetId);
-                        if (!facetId.equals("")) {                          
+                        if (!facetId.equals("")) {
 
                             String urlEnd = "&external_user=" + username + "&external_thesaurus=" + thesaurusName;
 

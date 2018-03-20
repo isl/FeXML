@@ -180,7 +180,6 @@ public class Query extends BasicServlet {
                                         + "\norder by $name collation '?lang=el-gr'"
                                         + "\nreturn";
 
-
                                 String returnBlock = "\n<option value='{$uri}{$name}' data-id='{$id}' image-path='{$imagePath}' data-type='" + type + "'>{$uri}{$name}</option>}";
 
                                 if (selectedType.equals(type)) {
@@ -205,7 +204,7 @@ public class Query extends BasicServlet {
                         String username = utils.getMatch(facetProps, "(?<=username=\")[^\"]*(?=\")");
                         String thesaurusName = utils.getMatch(facetProps, "(?<=thesaurusName=\")[^\"]*(?=\")");
                         String facetId = utils.getMatch(facetProps, "(?<=facetId=\")[^\"]*(?=\")");
-                        System.out.println("FACET ID is:" + facetId);
+//                        System.out.println("FACET ID is:" + facetId);
                         if (!facetId.equals("")) {
 
                             String urlEnd = "&external_user=" + username + "&external_thesaurus=" + thesaurusName;
@@ -215,6 +214,13 @@ public class Query extends BasicServlet {
                                     + "&operator_term=or&output_term1=name" + urlEnd;
 
                             String themasServiceResponse = utils.consumeService(serviceURL);
+                            if (themasServiceResponse.contains("<terms count=\"0\">")) {//Hierarchy, not facet, should call service again
+                                System.out.println("IT'S A HIERARCHY!");
+                                serviceURL = themasURL + "SearchResults_Terms?updateTermCriteria=parseCriteria"
+                                        + "&answerType=XMLSTREAM&pageFirstResult=SaveAll&input_term=topterm&op_term=refid=&inputvalue_term=" + facetId
+                                        + "&operator_term=or&output_term1=name" + urlEnd;
+                                themasServiceResponse = utils.consumeService(serviceURL);
+                            }
 
                             if (themasServiceResponse.length() > 0) {
                                 XMLFragment xml = new XMLFragment(themasServiceResponse);

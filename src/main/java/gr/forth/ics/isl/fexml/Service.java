@@ -66,23 +66,31 @@ public class Service extends BasicServlet {
         Utils utils = new Utils();
         String serviceURL = "";
         String xsl = "";
-        //http://139.91.183.97:8080/THEMAS/hierarchysTermsShortcuts?referenceId=382&action=facethierarchical&answerType=XMLSTREAM&external_user=ExternalReader&external_thesaurus=TESTDATA
-        if (termId.equals("0")) {
-//Entire Facet
+//        System.out.println("TERM ID=" + termId);
 
-            serviceURL = themasURL + "hierarchysTermsShortcuts?referenceId=" + facetId + "&action=facethierarchical&answerType=XMLSTREAM&external_user=" + username + "&external_thesaurus=" + thesaurusName;
+        //Code added to test if termId supplied returns anything. If so, then it is not a facet id, but a term or hierarchy id
+        serviceURL = themasURL + "SearchResults_Terms_Hierarchical?referenceId=" + termId + "&answerType=XMLSTREAM&external_user=" + username + "&external_thesaurus=" + thesaurusName;
+        String themasServiceResponse = utils.consumeService(serviceURL);
+
+        if (themasServiceResponse.length() == 0) {
+            //Hierarchy
+            serviceURL = themasURL + "SearchResults_Terms_Hierarchical?referenceId=" + facetId + "&answerType=XMLSTREAM&external_user=" + username + "&external_thesaurus=" + thesaurusName;
             xsl = baseURL + "/xsl/THEMAS/Thesaurus_Global_Hierarchical_View.xsl";
 
-         //Entire THESAURUS
-            // String serviceURL = themasURL + "hierarchysTermsShortcuts?action=GlobalThesarusHierarchical&answerType=XMLSTREAM&external_user=" + username + "&external_thesaurus=" + thesaurusName;
         } else {
-            serviceURL = themasURL + "SearchResults_Terms_Hierarchical?referenceId=" + termId + "&answerType=XMLSTREAM&external_user=" + username + "&external_thesaurus=" + thesaurusName;
-            xsl = baseURL + "/xsl/THEMAS/Hierarchical_Term_Display.xsl";
 
+            if (termId.equals("0")) {
+                //Entire Facet
+                serviceURL = themasURL + "hierarchysTermsShortcuts?referenceId=" + facetId + "&action=facethierarchical&answerType=XMLSTREAM&external_user=" + username + "&external_thesaurus=" + thesaurusName;
+                xsl = baseURL + "/xsl/THEMAS/Thesaurus_Global_Hierarchical_View.xsl";
+            } else {
+                serviceURL = themasURL + "SearchResults_Terms_Hierarchical?referenceId=" + termId + "&answerType=XMLSTREAM&external_user=" + username + "&external_thesaurus=" + thesaurusName;
+                xsl = baseURL + "/xsl/THEMAS/Hierarchical_Term_Display.xsl";
+
+            }
+//            System.out.println(serviceURL);
         }
-
-        String themasServiceResponse = utils.consumeService(serviceURL);
-        System.out.println(themasServiceResponse);
+        themasServiceResponse = utils.consumeService(serviceURL);
 
         String test = transform(themasServiceResponse, xsl);
 

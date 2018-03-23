@@ -89,6 +89,8 @@ public class UploadReceiver extends BasicServlet {
             filePath = "/Audio";
         } else if (fileType.equals("video")) {
             filePath = "/Video";
+        } else if (fileType.equals("docs")) {
+            filePath = "/Documents";
         } else if (fileType.equals("all")) {
             DBFile uploadsDBFile = new DBFile(this.DBURI, this.adminCollection, "Uploads.xml", this.DBuser, this.DBpassword);
             mime = Utils.findMime(uploadsDBFile, filename);
@@ -115,8 +117,6 @@ public class UploadReceiver extends BasicServlet {
             writeToTempFile(req.getInputStream(), new File(UPLOAD_DIR, filename), expectedFileSize);
         }
         writeResponse(filename, resp.getWriter(), msg, fileType, mime);
-
-
 
     }
 
@@ -150,16 +150,16 @@ public class UploadReceiver extends BasicServlet {
     }
 
     private void writeResponse(String filename, PrintWriter writer, String failureReason, String fileType, String mime) {
-      String fs =  System.getProperty("file.separator");
+        String fs = System.getProperty("file.separator");
         if (failureReason == null) {
             String sourcePath = UPLOAD_DIR.getPath();
             if (fileType.equals("photo")) {
-                resizeImage(filename, sourcePath, sourcePath.replace(fs+"original", fs+"thumbs"), thumbSize);
+                resizeImage(filename, sourcePath, sourcePath.replace(fs + "original", fs + "thumbs"), thumbSize);
             }
             String json = "{\"success\": true, \"filename\": \"" + filename + "\", \"mime\": \"" + mime + "\"}";
             writer.print(json);
-            if (fileType.equals("photo")) {                
-                resizeImage(filename, sourcePath, sourcePath.replace(fs+"original", fs+"normal"), normalSize);
+            if (fileType.equals("photo")) {
+                resizeImage(filename, sourcePath, sourcePath.replace(fs + "original", fs + "normal"), normalSize);
             } else if (fileType.equals("zip")) {
                 Utils utils = new Utils();
                 utils.unZipIt(filename, sourcePath);

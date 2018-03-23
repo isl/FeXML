@@ -170,6 +170,7 @@ var xmlEditor = (function() {
             "uploadAudioMessage": "Κάνετε κλικ ή σύρετε (όχι σε Internet Explorer) αρχείο ήχου",
             "uploadVideoMessage": "Κάνετε κλικ ή σύρετε (όχι σε Internet Explorer) αρχείο βίντεο",
             "uploadZipMessage": "Κάνετε κλικ ή σύρετε (όχι σε Internet Explorer) αρχείο zip",
+            "uploadDocsMessage": "Κάνετε κλικ ή σύρετε (όχι σε Internet Explorer) αρχείο κειμένου",
             "uploadAllMessage": "Κάνετε κλικ ή σύρετε (όχι σε Internet Explorer) το αρχείο",
             "underConstruction": "Η λειτουργία αυτή δεν είναι ακόμα διαθέσιμη"
 
@@ -227,6 +228,7 @@ var xmlEditor = (function() {
             "uploadAudioMessage": "Click or drag (not on Internet Explorer) audio file",
             "uploadVideoMessage": "Click or drag (not on Internet Explorer) video file",
             "uploadZipMessage": "Click or drag (not on Internet Explorer) zip file",
+            "uploadDocsMessage": "Click or drag (not on Internet Explorer) document file",
             "uploadAllMessage": "Click or drag (not on Internet Explorer) your file",
             "underConstruction": "This feature is not yet available"
 
@@ -283,6 +285,7 @@ var xmlEditor = (function() {
             "uploadAudioMessage": "Click or drag (not on Internet Explorer) audio file",
             "uploadVideoMessage": "Click or drag (not on Internet Explorer) video file",
             "uploadZipMessage": "Click or drag (not on Internet Explorer) zip file",
+            "uploadDocsMessage": "Click or drag (not on Internet Explorer) document file",
             "uploadAllMessage": "Click or drag (not on Internet Explorer) your file",
             "underConstruction": "This feature is not yet available"
 
@@ -383,17 +386,17 @@ var xmlEditor = (function() {
             var xpathWithoutRecursion = detectRecursion(xpath);
 
             if (xpath !== xpathWithoutRecursion) {//&& xpathWithoutRecursion!=='Essay'
-               
+
                 pathIndex = jQuery.inArray(xpathWithoutRecursion, xpaths);
             }
             /* Code added to overcome recursion issues END*/
 
 
             if (xpaths[pathIndex + 1].lastIndexOf(xpaths[pathIndex], 0) === 0) {//has children
-                
-                if (view==="1") {//If view mode, then there is no point in looking for optional or multiple children.
+
+                if (view === "1") {//If view mode, then there is no point in looking for optional or multiple children.
                     return "Parent";
-                } 
+                }
                 //Now we must determine if children are editable, ie if we may add or delete them.                
                 if (_hasOptionalOrMultipleChildren(xpath)) {
                     return "ParentWithActions";
@@ -1163,9 +1166,10 @@ var xmlEditor = (function() {
                                 nodeValueStr = "<img class='uploadedFile' title=" + nodeValueStr.replace(/\s/g, "%20") + " alt=" + nodeValueStr.replace(/\s/g, "%20") + " src='FetchBinFile?file=mp3.png' rel='../EKBMM/GetInfo?entity=" + type.value + "&file=" + encodedNodeValueStr.replace(/\s/g, "%20") + "'/>";
                             } else if (fileType == "video") {
                                 nodeValueStr = "<img class='uploadedFile' title=" + nodeValueStr.replace(/\s/g, "%20") + " alt=" + nodeValueStr.replace(/\s/g, "%20") + " src='FetchBinFile?file=video.png' rel='FetchBinFile?file=" + type.value + "/Video/" + encodedNodeValueStr.replace(/\s/g, "%20") + "'/>";
-                            }
-                            else if (fileType == "zip") {
+                            } else if (fileType == "zip") {
                                 nodeValueStr = "<img class='uploadedFile' title=" + nodeValueStr.replace(/\s/g, "%20") + " alt=" + nodeValueStr.replace(/\s/g, "%20") + " src='FetchBinFile?file=zip.png' rel='FetchBinFile?file=" + type.value + "/" + encodedNodeValueStr.replace(/\s/g, "%20") + "'/>";
+                            } else if (fileType == "docs") {
+                                nodeValueStr = "<img class='uploadedFile' title=" + nodeValueStr.replace(/\s/g, "%20") + " alt=" + nodeValueStr.replace(/\s/g, "%20") + " src='FetchBinFile?file=docs.png' rel='FetchBinFile?file=" + type.value + "/Documents/" + encodedNodeValueStr.replace(/\s/g, "%20") + "'/>";
                             } else if (fileType == "all") {
                                 var xml = _self.getXmlAsString();
                                 var archiveType = xml.substring(xml.indexOf("<type>") + 6, xml.indexOf("</type>"));
@@ -2011,8 +2015,11 @@ var xmlEditor = (function() {
                 } else if (fileType == "zip") {
                     allowedExtensions = ['zip'];
                     uploadMessage = _message["uploadZipMessage"];
+                } else if (fileType == "docs") {
+                    allowedExtensions = ['doc', 'docx', 'pdf'];
+                    uploadMessage = _message["uploadDocsMessage"];
                 } else if (fileType == 'all') {
-                    allowedExtensions = ['jpeg', 'jpg', 'gif', 'png', 'mp3', 'zip', 'mp4', 'doc', 'pdf', 'avi', 'mpeg', 'dwg'];
+                    allowedExtensions = ['jpeg', 'jpg', 'gif', 'png', 'mp3', 'zip', 'mp4', 'doc', 'docx', 'pdf', 'avi', 'mpeg', 'dwg'];
                     uploadMessage = _message["uploadAllMessage"];
                 }
             }
@@ -2058,6 +2065,9 @@ var xmlEditor = (function() {
                     } else if (fileType == "zip") {
                         url = "FetchBinFile?file=zip.png";
                         binaryUrl = "FetchBinFile?file=" + type.value + "/" + encodeURIComponent(responseJSON.filename);
+                    } else if (fileType == "docs") {
+                        url = "FetchBinFile?file=docs.png";
+                        binaryUrl = "FetchBinFile?file=" + type.value + "/Documents/" + encodeURIComponent(responseJSON.filename);
                     } else if (fileType == "all") {
                         if (mime == "Photos") {
                             url = "FetchBinFile?size=small&file=" + type.value + "/" + mime + "/" + encodeURIComponent(responseJSON.filename);

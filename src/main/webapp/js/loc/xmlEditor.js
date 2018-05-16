@@ -95,7 +95,7 @@ var loggable = function(obj /* , objName, debugMode */) {
                 if (arguments.length) {
                     arguments[0] = prefix + arguments[0];
                 }
-                console.log.apply(null, arguments);
+//                console.log.apply(null, arguments);
             }
         }
     })(prefix);
@@ -384,7 +384,7 @@ var xmlEditor = (function() {
             /*START Code added to overcome recursion issues */
             var xpath = xpaths[pathIndex];
             var xpathWithoutRecursion = detectRecursion(xpath);
-
+//console.log(xpath+"---"+xpathWithoutRecursion)
             if (xpath !== xpathWithoutRecursion) {//&& xpathWithoutRecursion!=='Essay'
 
                 pathIndex = jQuery.inArray(xpathWithoutRecursion, xpaths);
@@ -392,7 +392,8 @@ var xmlEditor = (function() {
             /* Code added to overcome recursion issues END*/
 
 
-            if (xpaths[pathIndex + 1].lastIndexOf(xpaths[pathIndex], 0) === 0) {//has children
+            if (xpaths[pathIndex + 1].lastIndexOf(xpaths[pathIndex] + "/", 0) === 0) {//has children (added / after path to avoid accidental same names such as 
+                // Bibliography/Title -- Bibliography/TitleOfCollectiveVolume
 
                 if (view === "1") {//If view mode, then there is no point in looking for optional or multiple children.
                     return "Parent";
@@ -628,6 +629,7 @@ var xmlEditor = (function() {
                         })
 
                         .delegate("p.nodeValue", "click", function() {
+
                             var $this = $(this),
                                     node = _getNodeFromElemAttr($this);
                             //Had to change due to IE problems
@@ -726,6 +728,7 @@ var xmlEditor = (function() {
                                 _self.editValueBrowse($this, node, "ics");
                             } else {
 
+
                                 var type = $("#type").val();
                                 if (type.length > 0) {
                                     $.post("Query", {
@@ -735,7 +738,7 @@ var xmlEditor = (function() {
                                         lang: _lang
                                     }, function(response) {
 
-                                        //alert(response);
+
                                         if (response.indexOf("type=") > -1) {
                                             _self.editValue($this, node, _getNodeValue(node), false, response);
                                         }
@@ -1193,7 +1196,8 @@ var xmlEditor = (function() {
                 }
 
 
-
+//console.log(xpaths[pathIndex])
+//console.log(_getNodeType(pathIndex))
                 if (_getNodeType(pathIndex) === "Leaf") {
                     nodeHtml = nodeHtml + '<ul class="nodeCore">' +
                             '<li><p class="' + nodeValueClass + '">' + nodeValueStr + '</p></li>' +
@@ -2186,6 +2190,7 @@ var xmlEditor = (function() {
                         var type = select.options[select.selectedIndex].getAttribute("data-type");
                         var popUpURL = document.URL.replace(/type=([^&]+)/g, "type=" + type);
                         popUpURL = popUpURL.replace(/id=([^&]+)/g, "id=" + id);
+                        popUpURL = popUpURL + "&action=view";//Opens entity always in view mode!
                         centeredPopup(popUpURL, 'myWindow', '700', '500', 'yes');
                     }
                 });

@@ -129,7 +129,12 @@ This file is part of the FeXML webapp.
                                 <xsl:when test="$lang='en'">Collapse All</xsl:when>
                             </xsl:choose>
                         </xsl:variable>
-                         
+                        <xsl:variable name="editText">
+                            <xsl:choose>
+                                <xsl:when test="$lang='gr'">Επεξεργασία</xsl:when>
+                                <xsl:when test="$lang='en'">Edit</xsl:when>
+                            </xsl:choose>
+                        </xsl:variable>
                         <xsl:variable name="viewText">
                             <xsl:choose>
                                 <xsl:when test="$lang='gr'">Προβολή</xsl:when>
@@ -161,29 +166,41 @@ This file is part of the FeXML webapp.
                             </xsl:choose>
                         </xsl:variable>
 
-                        <xsl:if test="//output/viewMode='0' or //output/viewMode='2'">
-                            <xsl:if test="//output/editorType='standalone'">
-                                <a href="File?action=New&amp;type={$type}&amp;lang={$lang}&amp;depth={//output/depth}" id="home">
-                                    <button id="createFile" title="{$createText}">
-                                        <img src="img/create.png" alt="{$createText}" title="{$createText}" border="0" />
-                                    </button>
-                                </a>
-                            </xsl:if>
-                            <button id="saveFile" title="{$saveText}">
-                                <img src="img/save.png" alt="{$saveText}" title="{$saveText}" />
-                            </button>
-                            <button id="view" title="{$viewText}" onclick="centeredPopup('Index?&amp;type={$type}&amp;action=view&amp;lang={$lang}&amp;id={//output/id}&amp;depth={//output/depth}','myWindow','900','600','yes');return false;">
-                                <img src="img/view.png" alt="{$viewText}" title="{$viewText}" />
-                            </button>
-                            <button id="referencesButton" title="{$referenceText}">
-                                <img src="img/references.png" alt="{$referenceText}" title="{$referenceText}" />
-                            </button>
-                            <button id="validateFile" title="{$validateText}">
-                                <img src="img/validate.png" alt="{$validateText}" title="{$validateText}" />
-                            </button>
-                
-
-                        </xsl:if>
+                        <xsl:choose>
+                            <xsl:when test="//output/viewMode='0' or //output/viewMode='2'">
+                                <xsl:if test="//output/editorType='standalone'">
+                                    <a href="File?action=New&amp;type={$type}&amp;lang={$lang}&amp;depth={//output/depth}" id="home">
+                                        <button id="createFile" title="{$createText}">
+                                            <img src="img/create.png" alt="{$createText}" title="{$createText}" border="0" />
+                                        </button>
+                                    </a>
+                                </xsl:if>
+                                <button id="saveFile" title="{$saveText}">
+                                    <img src="img/save.png" alt="{$saveText}" title="{$saveText}" />
+                                </button>
+                                <button id="view" title="{$viewText}" onclick="centeredPopup('Index?&amp;type={$type}&amp;action=view&amp;lang={$lang}&amp;id={//output/id}&amp;depth={//output/depth}','myWindow','900','600','yes');return false;">
+                                    <img src="img/view.png" alt="{$viewText}" title="{$viewText}" />
+                                </button>
+                                <button id="referencesButton" title="{$referenceText}">
+                                    <img src="img/references.png" alt="{$referenceText}" title="{$referenceText}" />
+                                </button>
+                                <button id="validateFile" title="{$validateText}">
+                                    <img src="img/validate.png" alt="{$validateText}" title="{$validateText}" />
+                                </button>
+                   
+ 
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <button id="edit" title="{$editText}" onclick="window.open('Index?&amp;type={$type}&amp;lang={$lang}&amp;id={//output/id}','_self')">
+                                    <img src="img/edit.png" alt="{$editText}" title="{$editText}" />
+                                </button>    
+                                                               
+                            </xsl:otherwise>
+                            
+                        </xsl:choose>
+                     
+                        
+                        
                         <button id="documentMap" title="{$documentMapText}" onclick="openMap();">
                             <img src="img/documentMap.png" alt="{$documentMapText}" title="{$documentMapText}" />
                         </button>

@@ -2118,37 +2118,37 @@ var xmlEditor = (function() {
                     $btnCancel = $("<button class='cancel' style='float:right;'>" + _message["cancel"] + "</button>"),
                     $btnWrap = $("<div class='editTextValueButtons'></div>").append($btnCancel).append($btnSubmit);
             if (mode === "entity") {
-                var $btnGo = $("<button class='submit go'>-></button>");
-                var links = "";
+//                var $btnGo = $("<button class='submit go'>-></button>");
 
-                var $optgroups = $field.find("optgroup");
-                var linkEntitiesCount = $optgroups.length;
 
-                if (linkEntitiesCount > 1) {
-                    $optgroups.each(function() {
-                        var entityType = $(this).attr("label");
-                        var popUpURL = "File?action=New&type=" + entityType + "&lang=" + lang;
-                        var clickScript = "centeredPopup('" + popUpURL + "', 'myWindow', '700', '500', 'yes');return false;";
-
-                        links = links + "<a href='#' onclick=\"" + clickScript + "\">" + entityType + "</a>";
-
-                    })
-
-                    $btnNew = $('<div class="dropdown">' +
-                            '<button class="dropbtn">' + _message["createNew"] + '</button>' +
-                            '<div class="dropdown-content">' +
-                            links +
-                            '</div>' +
-                            '</div>');
-                } else {
-                    var entityType = $optgroups.attr("label");
-                    var popUpURL = "File?action=New&type=" + entityType + "&lang=" + lang;
-                    var clickScript = "centeredPopup('" + popUpURL + "', 'myWindow', '700', '500', 'yes');return false;";
-                    var $btnNew = $("<button class='submit createNew' onclick=\"" + clickScript + "\">" + _message["createNew"] + "</button>");
-                }
-                $valueWrap.hide().parent().append($field).append($btnGo).append($btnNew).append($btnWrap);
-            }
-            else if (mode === "vocabulary") {
+//                var links = "";
+//                var $optgroups = $field.find("optgroup");
+//                var linkEntitiesCount = $optgroups.length;
+//
+//                if (linkEntitiesCount > 1) {
+//                    $optgroups.each(function() {
+//                        var entityType = $(this).attr("label");
+//                        var popUpURL = "File?action=New&type=" + entityType + "&lang=" + lang;
+//                        var clickScript = "centeredPopup('" + popUpURL + "', 'myWindow', '700', '500', 'yes');return false;";
+//
+//                        links = links + "<a href='#' onclick=\"" + clickScript + "\">" + entityType + "</a>";
+//
+//                    })
+//
+//                    $btnNew = $('<div class="dropdown">' +
+//                            '<button class="dropbtn">' + _message["createNew"] + '</button>' +
+//                            '<div class="dropdown-content">' +
+//                            links +
+//                            '</div>' +
+//                            '</div>');
+//                } else {
+//                    var entityType = $optgroups.attr("label");
+//                    var popUpURL = "File?action=New&type=" + entityType + "&lang=" + lang;
+//                    var clickScript = "centeredPopup('" + popUpURL + "', 'myWindow', '700', '500', 'yes');return false;";
+//                    var $btnNew = $("<button class='submit createNew' onclick=\"" + clickScript + "\">" + _message["createNew"] + "</button>");
+//                }
+//                $valueWrap.hide().parent().append($field).append($btnGo).append($btnNew).append($btnWrap);
+            } else if (mode === "vocabulary") {
                 var btnVoc = "";
                 $btnVoc = $("<button id='voc'>+</button>");
                 $valueWrap.hide().parent().append($field).append($btnVoc).append($btnWrap);
@@ -2191,25 +2191,59 @@ var xmlEditor = (function() {
                     $image = $('<img>', {
                         src: "FetchBinFile?size=small&file=" + data_type + "/Photos/" + imagePath,
                         height: 36,
-                        title: $field.val()
+                        title: $field.val(),
+                                                class: "thumb"
+
                     });
                     $valueWrap.hide().parent().append($field).find("img").remove();
-                    $valueWrap.hide().parent().append($field).append($image).append($btnGo).append($btnWrap);
+                $valueWrap.hide().parent().append($field).append($image).append($btnGo).append($btnNew).append($btnWrap);
                 });
                 //add photo next to combo
-
+                var $image = "";
                 if (photoTypes.indexOf(data_type) > -1) {
 
                     var imagePath = select.options[select.selectedIndex].getAttribute("image-path");
                     $image = $('<img>', {
                         src: "FetchBinFile?size=small&file=" + data_type + "/Photos/" + imagePath,
                         height: 36,
-                        title: $field.val()
+                        title: $field.val(),
+                        class: "thumb"
 
                     });
-                    $valueWrap.hide().parent().append($field).append($image).append($btnGo).append($btnWrap);
+//                    $valueWrap.hide().parent().append($field).append($image).append($btnGo).append($btnWrap);
+                }
+                var $btnGo = $("<button class='submit go'>-></button>");
+
+
+                var links = "";
+                var $optgroups = $field.find("optgroup");
+                var linkEntitiesCount = $optgroups.length;
+
+                if (linkEntitiesCount > 1) {
+                    $optgroups.each(function() {
+                        var entityType = $(this).attr("label");
+                        var popUpURL = "File?action=New&type=" + entityType + "&lang=" + lang;
+                        var clickScript = "centeredPopup('" + popUpURL + "', 'myWindow', '700', '500', 'yes');return false;";
+
+                        links = links + "<a href='#' onclick=\"" + clickScript + "\">" + entityType + "</a>";
+
+                    })
+
+                    $btnNew = $('<div class="dropdown">' +
+                            '<button class="dropbtn">' + _message["createNew"] + '</button>' +
+                            '<div class="dropdown-content">' +
+                            links +
+                            '</div>' +
+                            '</div>');
+                } else {
+                    var entityType = $optgroups.attr("label");
+                    var popUpURL = "File?action=New&type=" + entityType + "&lang=" + lang;
+                    var clickScript = "centeredPopup('" + popUpURL + "', 'myWindow', '700', '500', 'yes');return false;";
+                    var $btnNew = $("<button class='submit createNew' onclick=\"" + clickScript + "\">" + _message["createNew"] + "</button>");
                 }
 
+
+                $valueWrap.hide().parent().append($field).append($image).append($btnGo).append($btnNew).append($btnWrap);
 
                 $btnGo.click(function() {
                     var select = $(this).parent().parent()[0].getElementsByTagName("select")[0];

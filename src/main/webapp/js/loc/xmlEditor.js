@@ -148,6 +148,7 @@ var xmlEditor = (function() {
             "cancel": "Ακύρωση",
             "add": "Προσθήκη",
             "delete": "Διαγραφή",
+            "createNew": "Δημιουργία",
             // Button tooltips
             "goUp": "Μετακίνηση μια θέση πάνω",
             "goDown": "Μετακίνηση μια θέση κάτω",
@@ -206,6 +207,7 @@ var xmlEditor = (function() {
             "cancel": "Cancel",
             "add": "Add",
             "delete": "Delete",
+            "createNew": "Create new",
             // Button tooltips
             "goUp": "Move one place up",
             "goDown": "Move one place down",
@@ -263,6 +265,7 @@ var xmlEditor = (function() {
             "cancel": "Cancel",
             "add": "Add",
             "delete": "Delete",
+            "createNew": "Create new",
             // Button tooltips
             "goUp": "Move one place up",
             "goDown": "Move one place down",
@@ -2115,9 +2118,35 @@ var xmlEditor = (function() {
                     $btnCancel = $("<button class='cancel' style='float:right;'>" + _message["cancel"] + "</button>"),
                     $btnWrap = $("<div class='editTextValueButtons'></div>").append($btnCancel).append($btnSubmit);
             if (mode === "entity") {
-                var btnGo = "";
-                $btnGo = $("<button class='submit go'>-></button>");
-                $valueWrap.hide().parent().append($field).append($btnGo).append($btnWrap);
+                var $btnGo = $("<button class='submit go'>-></button>");
+                var links = "";
+
+                var $optgroups = $field.find("optgroup");
+                var linkEntitiesCount = $optgroups.length;
+
+                if (linkEntitiesCount > 1) {
+                    $optgroups.each(function() {
+                        var entityType = $(this).attr("label");
+                        var popUpURL = "File?action=New&type=" + entityType + "&lang=" + lang;
+                        var clickScript = "centeredPopup('" + popUpURL + "', 'myWindow', '700', '500', 'yes');return false;";
+
+                        links = links + "<a href='#' onclick=\"" + clickScript + "\">" + entityType + "</a>";
+
+                    })
+
+                    $btnNew = $('<div class="dropdown">' +
+                            '<button class="dropbtn">' + _message["createNew"] + '</button>' +
+                            '<div class="dropdown-content">' +
+                            links +
+                            '</div>' +
+                            '</div>');
+                } else {
+                    var entityType = $optgroups.attr("label");
+                    var popUpURL = "File?action=New&type=" + entityType + "&lang=" + lang;
+                    var clickScript = "centeredPopup('" + popUpURL + "', 'myWindow', '700', '500', 'yes');return false;";
+                    var $btnNew = $("<button class='submit createNew' onclick=\"" + clickScript + "\">" + _message["createNew"] + "</button>");
+                }
+                $valueWrap.hide().parent().append($field).append($btnGo).append($btnNew).append($btnWrap);
             }
             else if (mode === "vocabulary") {
                 var btnVoc = "";
@@ -2190,7 +2219,7 @@ var xmlEditor = (function() {
                         var type = select.options[select.selectedIndex].getAttribute("data-type");
                         var popUpURL = document.URL.replace(/type=([^&]+)/g, "type=" + type);
                         popUpURL = popUpURL.replace(/id=([^&]+)/g, "id=" + id);
-                        popUpURL = popUpURL + "&action=view";//Opens entity always in view mode!
+                        popUpURL = popUpURL.replace(/type=/g, "action=view&type=");//Opens entity always in view mode!
                         centeredPopup(popUpURL, 'myWindow', '700', '500', 'yes');
                     }
                 });

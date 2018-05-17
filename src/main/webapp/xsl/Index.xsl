@@ -45,9 +45,9 @@ This file is part of the FeXML webapp.
             <head>
                 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
                 <!--Favicon line follows-->
-                <link rel="shortcut icon" href="formating/images/fav.png"/>
+                <link rel="shortcut icon" href="img/xml.png"/>
                 <title>FeXML</title>
-               
+                
 
                 <script>
                     var lang =<xsl:value-of select="concat($apos,$lang,$apos)"/>;

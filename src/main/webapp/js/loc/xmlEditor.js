@@ -1964,13 +1964,13 @@ var xmlEditor = (function() {
 
 
             $editForm.submit(function() {
+                console.log("UPDATING=" + nodePath)
                 if (html) {
                     var content = myNicEditor.instanceById(nodePath).getContent();
                     myNicEditor.removeInstance(nodePath);
                     _self.setNodeValue(node, content); // update XML node value "<![CDATA["+content+"]]>"
                 }
                 else {
-
                     value = $field.val();
                     _self.setNodeValue(node, value);
                 }
@@ -1978,7 +1978,6 @@ var xmlEditor = (function() {
 
 
                 if (html) {
-
                     if ($.trim(content.replace(/&nbsp;/g, "").replace(/<[^>]+>/g, "")).length == 0) {
                         var $emptyValue = $("<span class='noValue'>" + _message["noTextValue"] + "</span>");
                         value = $emptyValue.html();
@@ -2118,36 +2117,7 @@ var xmlEditor = (function() {
                     $btnCancel = $("<button class='cancel' style='float:right;'>" + _message["cancel"] + "</button>"),
                     $btnWrap = $("<div class='editTextValueButtons'></div>").append($btnCancel).append($btnSubmit);
             if (mode === "entity") {
-//                var $btnGo = $("<button class='submit go'>-></button>");
-
-
-//                var links = "";
-//                var $optgroups = $field.find("optgroup");
-//                var linkEntitiesCount = $optgroups.length;
-//
-//                if (linkEntitiesCount > 1) {
-//                    $optgroups.each(function() {
-//                        var entityType = $(this).attr("label");
-//                        var popUpURL = "File?action=New&type=" + entityType + "&lang=" + lang;
-//                        var clickScript = "centeredPopup('" + popUpURL + "', 'myWindow', '700', '500', 'yes');return false;";
-//
-//                        links = links + "<a href='#' onclick=\"" + clickScript + "\">" + entityType + "</a>";
-//
-//                    })
-//
-//                    $btnNew = $('<div class="dropdown">' +
-//                            '<button class="dropbtn">' + _message["createNew"] + '</button>' +
-//                            '<div class="dropdown-content">' +
-//                            links +
-//                            '</div>' +
-//                            '</div>');
-//                } else {
-//                    var entityType = $optgroups.attr("label");
-//                    var popUpURL = "File?action=New&type=" + entityType + "&lang=" + lang;
-//                    var clickScript = "centeredPopup('" + popUpURL + "', 'myWindow', '700', '500', 'yes');return false;";
-//                    var $btnNew = $("<button class='submit createNew' onclick=\"" + clickScript + "\">" + _message["createNew"] + "</button>");
-//                }
-//                $valueWrap.hide().parent().append($field).append($btnGo).append($btnNew).append($btnWrap);
+                $valueWrap.hide().parent().append($field).append($btnGo).append($btnNew).append($btnWrap);
             } else if (mode === "vocabulary") {
                 var btnVoc = "";
                 $btnVoc = $("<button id='voc'>+</button>");
@@ -2182,7 +2152,7 @@ var xmlEditor = (function() {
                 }
                 $valueWrap.text(value).show().parent().find("select, button, div.editTextValueButtons,input,b, div").remove();
             });
-            if (mode == "entity") {
+            if (mode === "entity") {
                 var select = $field.get(0);
                 var data_type = select.options[select.selectedIndex].getAttribute("data-type");
                 $field.change(function() {
@@ -2192,11 +2162,11 @@ var xmlEditor = (function() {
                         src: "FetchBinFile?size=small&file=" + data_type + "/Photos/" + imagePath,
                         height: 36,
                         title: $field.val(),
-                                                class: "thumb"
+                        class: "thumb"
 
                     });
                     $valueWrap.hide().parent().append($field).find("img").remove();
-                $valueWrap.hide().parent().append($field).append($image).append($btnGo).append($btnNew).append($btnWrap);
+                    $valueWrap.hide().parent().append($field).append($image).append($btnGo).append($btnNew).append($btnWrap);
                 });
                 //add photo next to combo
                 var $image = "";

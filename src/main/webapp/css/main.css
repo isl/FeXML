@@ -542,7 +542,7 @@ input.list
 }
 button#voc, button.go, button#th, button.createNew
 {
-    margin-bottom: 1px;
+    margin-bottom: 12px !important;
     margin-left: 4px;
     vertical-align: middle;
 }

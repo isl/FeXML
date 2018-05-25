@@ -160,11 +160,9 @@ function init(xml) {
         } else {
             xmlEditor.renderTree();
 
-        }
-        //        createMap();
-        //        xmlEditor.renderTree();
+        }      
 
-        //alert("sss");
+        auto(type); //run auto code
         $("button#saveFile").show().click(function() {
             GLR.messenger.show({
                 //   msg:"Αποθήκευση αρχείου...",

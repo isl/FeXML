@@ -173,7 +173,9 @@ var xmlEditor = (function() {
             "uploadZipMessage": "Κάνετε κλικ ή σύρετε (όχι σε Internet Explorer) αρχείο zip",
             "uploadDocsMessage": "Κάνετε κλικ ή σύρετε (όχι σε Internet Explorer) αρχείο κειμένου",
             "uploadAllMessage": "Κάνετε κλικ ή σύρετε (όχι σε Internet Explorer) το αρχείο",
-            "underConstruction": "Η λειτουργία αυτή δεν είναι ακόμα διαθέσιμη"
+            "underConstruction": "Η λειτουργία αυτή δεν είναι ακόμα διαθέσιμη",
+            //Rest
+            "lockedByField": "Το πεδίο έχει κλειδωθεί, επειδή έχει ήδη συμπληρωθεί τιμή στο εναλλακτικό πεδίο"
 
 
 
@@ -232,7 +234,9 @@ var xmlEditor = (function() {
             "uploadZipMessage": "Click or drag (not on Internet Explorer) zip file",
             "uploadDocsMessage": "Click or drag (not on Internet Explorer) document file",
             "uploadAllMessage": "Click or drag (not on Internet Explorer) your file",
-            "underConstruction": "This feature is not yet available"
+            "underConstruction": "This feature is not yet available",
+            //Rest
+            "lockedByField": "Field is locked, because there is already a value in alternative field"
 
 
 
@@ -290,7 +294,9 @@ var xmlEditor = (function() {
             "uploadZipMessage": "Click or drag (not on Internet Explorer) zip file",
             "uploadDocsMessage": "Click or drag (not on Internet Explorer) document file",
             "uploadAllMessage": "Click or drag (not on Internet Explorer) your file",
-            "underConstruction": "This feature is not yet available"
+            "underConstruction": "This feature is not yet available",
+            //Rest
+            "lockedByField": "Field is locked, because there is already a value in alternative field"
 
 
 
@@ -1964,15 +1970,18 @@ var xmlEditor = (function() {
 
 
             $editForm.submit(function() {
-                console.log("UPDATING=" + nodePath)
                 if (html) {
                     var content = myNicEditor.instanceById(nodePath).getContent();
                     myNicEditor.removeInstance(nodePath);
                     _self.setNodeValue(node, content); // update XML node value "<![CDATA["+content+"]]>"
+                    autoForXpath($("#type").attr("value"), _get_XPath(node), content);
+
                 }
                 else {
                     value = $field.val();
                     _self.setNodeValue(node, value);
+                    autoForXpath($("#type").attr("value"), _get_XPath(node), value);
+
                 }
 
 
@@ -2137,6 +2146,8 @@ var xmlEditor = (function() {
             $btnSubmit.click(function() {
                 var select = $(this).parent().parent()[0].getElementsByTagName("select")[0];
                 value = $field.val();
+                autoForXpath($("#type").attr("value"), nodePath, value);
+
                 var id = select.options[select.selectedIndex].getAttribute("data-id");
                 _self.setNodeValue(node, value);
                 _self.setAttribute(node, prefix + "_id", id);

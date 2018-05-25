@@ -298,7 +298,7 @@ This file is part of the FeXML webapp.
                 <script src='js/jquery.form.js'></script>
                 <script src="js/jquery.fineuploader-3.0.js"/>
           
-
+                <script src="js/auto.js"/>               
             </body>
         </html>
     </xsl:template>

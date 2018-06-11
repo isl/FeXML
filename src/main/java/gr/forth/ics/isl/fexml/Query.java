@@ -206,22 +206,35 @@ public class Query extends BasicServlet {
                         String facetId = utils.getMatch(facetProps, "(?<=facetId=\")[^\"]*(?=\")");
 //                        System.out.println("FACET ID is:" + facetId);
                         if (!facetId.equals("")) {
+                            String facetURLpart = "";
+                            if (facetId.contains("_")) {//multiple facets
+                                String[] facets = facetId.split("_");
+
+                                for (String fac : facets) {
+                                    facetURLpart = facetURLpart + "&input_term=topterm&op_term=refid=&inputvalue_term=" + fac;
+                                }
+                            } else {
+                                facetURLpart = "&input_term=topterm&op_term=refid=&inputvalue_term=" + facetId;
+                            }
 
                             String urlEnd = "&external_user=" + username + "&external_thesaurus=" + thesaurusName;
 
                             String serviceURL = themasURL + "SearchResults_Terms?updateTermCriteria=parseCriteria"
-                                    + "&answerType=XMLSTREAM&pageFirstResult=SaveAll&input_term=facet&op_term=refid=&inputvalue_term=" + facetId
-                                    + "&operator_term=or&output_term1=name" + urlEnd;
+                                    + "&answerType=XMLSTREAM&pageFirstResult=SaveAll"
+                                    + "&operator_term=or&output_term1=name" + urlEnd
+                                    + facetURLpart;
 
                             String themasServiceResponse = utils.consumeService(serviceURL);
                             if (themasServiceResponse.contains("<terms count=\"0\">")) {//Hierarchy, not facet, should call service again
                                 System.out.println("IT'S A HIERARCHY!");
                                 serviceURL = themasURL + "SearchResults_Terms?updateTermCriteria=parseCriteria"
-                                        + "&answerType=XMLSTREAM&pageFirstResult=SaveAll&input_term=topterm&op_term=refid=&inputvalue_term=" + facetId
-                                        + "&operator_term=or&output_term1=name" + urlEnd;
+                                        + "&answerType=XMLSTREAM&pageFirstResult=SaveAll"
+                                        + "&operator_term=or&output_term1=name" + urlEnd
+                                        + facetURLpart;
                                 themasServiceResponse = utils.consumeService(serviceURL);
-                            }
 
+                            }
+//                            System.out.println(serviceURL);
                             if (themasServiceResponse.length() > 0) {
                                 XMLFragment xml = new XMLFragment(themasServiceResponse);
                                 ArrayList<String> terms = xml.query("//term/descriptor/text()");

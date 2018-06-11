@@ -60,21 +60,23 @@ function autoForXpath(type, nodePath, value) {
 
 function detectXOR(type) {
     var xorGroups = getAllXORGroups(type);
+    if (typeof xorGroups !== "undefined") {
 
-    for (var i = 0; i < xorGroups.length; i++) {
+        for (var i = 0; i < xorGroups.length; i++) {
 
-        var xorGroup = xorGroups[i];
-        for (var j = 0; j < xorGroup.length; j++) {
-            var xpath = xorGroup[j];
-            var $field = $("li[id='" + xpath + "']");
-            if ($field.find(".nodeValue").children("span.noValue").length === 0) {
-                var value = $field.find(".nodeValue").html();
-                if (value !== "--------------------") {//xor field has value
-                    autoForXpath(type, xpath, value);
-                    break;
+            var xorGroup = xorGroups[i];
+            for (var j = 0; j < xorGroup.length; j++) {
+                var xpath = xorGroup[j];
+                var $field = $("li[id='" + xpath + "']");
+                if ($field.find(".nodeValue").children("span.noValue").length === 0) {
+                    var value = $field.find(".nodeValue").html();
+                    if (value !== "--------------------") {//xor field has value
+                        autoForXpath(type, xpath, value);
+                        break;
+                    }
                 }
-            }
 
+            }
         }
     }
 }
@@ -124,10 +126,12 @@ function getAllXORGroups(type) {
 
 function getXORGroupFromXpath(type, nodePath) {
     var xorGroups = xorPaths[type];
-    for (var i = 0; i < xorGroups.length; i++) {
-        var group = xorGroups[i];
-        if (group.indexOf(nodePath) !== -1) {
-            return group;
+    if (typeof xorGroups !== "undefined") {
+        for (var i = 0; i < xorGroups.length; i++) {
+            var group = xorGroups[i];
+            if (group.indexOf(nodePath) !== -1) {
+                return group;
+            }
         }
     }
 }

@@ -165,6 +165,12 @@ This file is part of the FeXML webapp.
                                 <xsl:when test="$lang='en'">XML Map</xsl:when>
                             </xsl:choose>
                         </xsl:variable>
+                        <xsl:variable name="timePrimitiveExpressionsText">
+                            <xsl:choose>
+                                <xsl:when test="$lang='gr'">Παραδείγματα επιτρεπτών εκφράσεων χρόνου</xsl:when>
+                                <xsl:when test="$lang='en'">Examples of accepted time expressions</xsl:when>
+                            </xsl:choose>
+                        </xsl:variable>
 
                         <xsl:choose>
                             <xsl:when test="//output/viewMode='0' or //output/viewMode='2'">
@@ -216,8 +222,10 @@ This file is part of the FeXML webapp.
                         <button id="collapseAll" title="{$collapseAllText}" onclick="toggle_collapse_all()">
                             <img src="img/collapseAll.png" alt="{$collapseAllText}" title="{$collapseAllText}" />
                         </button>
-                         
-                      
+                        <button id="timePrimitiveExpressions" title="{$timePrimitiveExpressionsText}" onclick="centeredPopup('HelpPage_{$lang}.html','myWindow','900','600','yes');return false;">
+                            <img src="img/clock.png" alt="{$timePrimitiveExpressionsText}" title="{$timePrimitiveExpressionsText}" />
+                        </button>
+                        
 
                         <xsl:if test="//output/viewMode='0' or //output/viewMode='2'">
                             <xsl:if test="//output/editorType='standalone'">

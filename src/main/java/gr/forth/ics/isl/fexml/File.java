@@ -273,6 +273,7 @@ public class File extends BasicServlet {
                 dbf.xUpdate("//admin/read", "*");
                 dbf.xUpdate("//admin/locked", username);
                 dbf.xUpdate("//admin/write", username);
+                dbf.xUpdate("//admin/status", "unpublished");
 
                 String uri_name = DMSTag.valueOf("uri_name", "target", type, this.conf)[0]; //exume valei sto DMSTags.xml ths exist ena neo element uri_name
                 String uriValue = this.URI_Reference_Path + uri_name + "/" + newId;

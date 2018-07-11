@@ -1954,6 +1954,15 @@ var xmlEditor = (function() {
                         }
                     }
                 });
+                //Addition (ZOMINTHOS). May have to change previous blocks accordingly...
+                $test = $($.parseXML(xml)).find("BibliographicReference").children("Link");
+                $test.each(function() {
+                    var $link = $(this);
+                    if ($link.text().length > 0) {
+                        selectOptions["Index?action=view&type=" + $link.attr("sps_type") + "&id=" + $link.attr("sps_id")+"&lang="+lang] = $link.text();
+                    }
+                });
+
                 var myNicEditor = new nicEditor({
                     buttonList: ['bold', 'italic', 'underline', 'strikeThrough', 'subscript', 'superscript', 'link', 'link2', 'unlink'],
                     maxHeight: 200,

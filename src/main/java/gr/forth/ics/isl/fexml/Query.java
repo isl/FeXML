@@ -143,6 +143,9 @@ public class Query extends BasicServlet {
                                     pathOutput = pathOutput.append("concat($i/");
 
                                     for (String path : paths) {
+                                        if (!path.endsWith("]")) {//add [1] tp avoid cardinality issues
+                                            path = path +"[1]";
+                                        }
 
                                         pathCondition = pathCondition.append(path).append("!='' or");
                                         pathOutput = pathOutput.append(path.trim()).append("/string(),', ',$i/");
@@ -155,7 +158,6 @@ public class Query extends BasicServlet {
                                     pathCondition = pathCondition.append(valueFromXpath).append("!='']");
                                     pathOutput = pathOutput.append("$i/").append(valueFromXpath).append("/string()");
                                 }
-
                                 DBCollection dbc = new DBCollection(BasicServlet.DBURI, applicationCollection + "/" + type, BasicServlet.DBuser, BasicServlet.DBpassword);
                                 String digitalPath = "";
                                 try {
@@ -163,7 +165,6 @@ public class Query extends BasicServlet {
                                 } catch (DMSException ex) {
                                 } catch (ArrayIndexOutOfBoundsException e) {
                                 }
-
                                 String query = "let $col := collection('" + applicationCollection + "/" + type + "')" + pathCondition + "[.//lang='" + lang + "']"
                                         + "\nreturn"
                                         + "\n<select id='" + xpath + "'>"
@@ -192,6 +193,7 @@ public class Query extends BasicServlet {
                                 returnBlock = returnBlock + "\n</optgroup>"
                                         + "\n</select>";
                                 query = query + returnBlock;
+//                                System.out.println(query);
                                 result = result + dbc.query(query)[0];
                             }
                             result = result.replaceAll("(?s)</select><select[^>]+>[^<]+.*?(?=<optgroup)", "");

@@ -573,10 +573,10 @@ public class File extends BasicServlet {
         //StringBuilder output = new StringBuilder(input);
         return input;
     }
-
+    
     protected static void fixTime(DBFile dbf) {
         // System.out.println(dbf.queryString("//ΗμερομηνίαΤιμή[text()!='']"));
-        String[] times = dbf.queryString("//DateValue[text()!='']/text()");
+        String[] times = dbf.queryString("//*[@x and @y]/text()");
 
         for (String time : times) {
 
@@ -586,8 +586,8 @@ public class File extends BasicServlet {
             String to = Integer.toString(sisTime.getTo());
             System.out.println("from-->" + from);
             System.out.println("to---> " + to);
-            dbf.xUpdate("//DateValue[text()='" + time + "']/@x", from);
-            dbf.xUpdate("//DateValue[text()='" + time + "']/@y", to);
+            dbf.xUpdate("//*[@x and @y and text()='" + time + "']/@x", from);
+            dbf.xUpdate("//*[@x and @y and text()='" + time + "']/@y", to);
 
         }
 //                         SISdate test = new SISdate(-98299776,-98250816);

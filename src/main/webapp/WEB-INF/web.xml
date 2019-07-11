@@ -61,27 +61,27 @@ This file is part of the FeXML webapp.
     <context-param>
         <description>eXist database application collection. Change according your's collection name.</description>
         <param-name>applicationCollection</param-name>
-        <param-value>/db/DMSCOLLECTION/SYNTHESIS_MO</param-value>
+        <param-value>/db/DMSCOLLECTION/SYNTHESIS_THEATER</param-value>
     </context-param>
     <context-param>
         <description>eXist database admins files collection. Change according your's collection name</description>
         <param-name>adminCollection</param-name>
-        <param-value>/db/DMSCOLLECTION/SYNTHESIS_MO/DMSFILES</param-value>
+        <param-value>/db/DMSCOLLECTION/SYNTHESIS_THEATER/DMSFILES</param-value>
     </context-param>
     <context-param>
         <description>eXist database configuration files collection. Change according your's collection name</description>
         <param-name>configCollection</param-name>
-        <param-value>/db/DMSCOLLECTION/SYNTHESIS_MO/DMSFILES/applicationFiles</param-value>
+        <param-value>/db/DMSCOLLECTION/SYNTHESIS_THEATER/DMSFILES/applicationFiles</param-value>
     </context-param>
     <context-param>
         <description>eXist database xml files collection. Change according your's collection name</description>
         <param-name>configXMLCollection</param-name>
-        <param-value>/db/DMSCOLLECTION/SYNTHESIS_MO/DMSFILES/applicationFiles/xmlFiles</param-value>
+        <param-value>/db/DMSCOLLECTION/SYNTHESIS_THEATER/DMSFILES/applicationFiles/xmlFiles</param-value>
     </context-param>
     <context-param>
         <description>eXist database versions collection. Change according your's collection name.</description>
         <param-name>versionCollection</param-name>
-        <param-value>/db/DMSCOLLECTION/SYNTHESIS_MO_VERSIONS/</param-value>
+        <param-value>/db/DMSCOLLECTION/SYNTHESIS_THEATER_VERSIONS/</param-value>
     </context-param>
     <context-param>
         <param-name>verboseConnections</param-name>
@@ -99,7 +99,7 @@ This file is part of the FeXML webapp.
     <context-param>
         <description>Server folder with schema files. Change according to your setup.</description>
         <param-name>schemaFolder</param-name>
-        <param-value>C:\\Projects\\synthesis_mo\\Schema\\</param-value>
+        <param-value>D:\\Projects\\synthesis\synthesis_theater\Schema\</param-value>
     </context-param>
     <context-param>
         <description>Used to define if something has been modified inside schema folder. Once changed, local storage has to update its data.</description>
@@ -109,7 +109,7 @@ This file is part of the FeXML webapp.
     <context-param>
         <description>eXist database queries collection. Change according to your setup.</description>
         <param-name>configQueriesCollection</param-name>
-        <param-value>/db/DMSCOLLECTION/SYNTHESIS_MO/DMSFILES/applicationFiles/xqFiles</param-value>
+        <param-value>/db/DMSCOLLECTION/SYNTHESIS_THEATER/DMSFILES/applicationFiles/xqFiles</param-value>
     </context-param>
     <context-param>
         <description>beta to enable HTML editing</description>
@@ -119,12 +119,12 @@ This file is part of the FeXML webapp.
     <context-param>
         <description>Server folder with upload files. Change according to your setup.</description>
         <param-name>uploadsFolder</param-name>
-        <param-value>C:\\Projects\\synthesis_mo\\uploads\\</param-value>
+        <param-value>D:\\Projects\\synthesis\\synthesis_theater\\uploads\\</param-value>
     </context-param>
     <context-param>
         <description>URI value. Change according to your setup.</description>
         <param-name>URI_Reference_Path</param-name>
-        <param-value>http://synthesis_mo.gr/</param-value>
+        <param-value>http://agia_aikaterini.gr/</param-value>
     </context-param>
     <context-param>
         <param-name>maxCollsize</param-name>
@@ -167,8 +167,23 @@ This file is part of the FeXML webapp.
     </context-param>
     <context-param>
         <param-name>entityWithPhoto</param-name>
-        <param-value>DigitalArchive,Contract</param-value>
+        <param-value>DigitalArchive,Contract,ArchivalMaterial</param-value>
     </context-param>
+    <context-param>
+        <description>fedora status- values:on-off</description>
+        <param-name>fedoraStatus</param-name>
+        <param-value>off</param-value>
+    </context-param>	
+    <context-param>
+        <description>fedoraUrl</description>
+        <param-name>fedoraUrl</param-name>
+        <param-value>http://localhost:8080/rest/</param-value>
+    </context-param>
+    
+    <listener>
+        <display-name>ImageIO service provider loader/unloader</display-name>
+        <listener-class>com.twelvemonkeys.servlet.image.IIOProviderContextListener</listener-class>
+    </listener>
     <filter>
         <filter-name>LoginFilter</filter-name>
         <filter-class>gr.forth.ics.isl.fexml.filter.LoginFilter</filter-class>

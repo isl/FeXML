@@ -85,12 +85,12 @@
  * @param 	{boolean} 	debugMode	Optional switch for disabling logging
  */
 
-var loggable = function(obj /* , objName, debugMode */) {
+var loggable = function (obj /* , objName, debugMode */) {
     var objName = arguments[1] || "",
             debugMode = (typeof arguments[2] !== "undefined") ? arguments[2] : true;
     prefix = objName ? objName + ": " : "";
-    obj.log = (function(prefix) {
-        return function() {
+    obj.log = (function (prefix) {
+        return function () {
             if (debugMode && typeof console !== "undefined") {
                 if (arguments.length) {
                     arguments[0] = prefix + arguments[0];
@@ -107,7 +107,7 @@ var loggable = function(obj /* , objName, debugMode */) {
  * and providing functionality for editing the memory copy of the file in real time.
  * Updated XML can be converted to a string and passed to a separate process for saving.
  */
-var xmlEditor = (function() {
+var xmlEditor = (function () {
 
     // private members
     var _nodeRefs = [], // will hold references to XML nodes
@@ -497,7 +497,7 @@ var xmlEditor = (function() {
      * @return 	{jQuery}	jQuery collection of text nodes
      */
     function _getTextNodes(node) {
-        return $(node).contents().filter(function() {
+        return $(node).contents().filter(function () {
             return (
                     ((this.nodeName == "#text" && this.nodeType == "3") || this.nodeType == "4") && // text node, or CDATA node
                     ($.trim(this.nodeValue.replace("\n", "")) !== "") // not empty
@@ -592,7 +592,7 @@ var xmlEditor = (function() {
     var _self = {
         xml: {}, // variable will hold the XML DOM object
         $container: $(document.body), // initialize as body, but should override with specific container
-        log: function() {
+        log: function () {
         }, // empty function. installed via $.loggable()
 
         /**
@@ -600,19 +600,19 @@ var xmlEditor = (function() {
          * Happens only once, during renderAsHTML()
          */
 
-        assignEditHandlers: function() {
+        assignEditHandlers: function () {
 
             if (view == 0 || view == 2) {
                 $("#xml")
-                        .delegate("span.nodeName", "click", function() {
+                        .delegate("span.nodeName", "click", function () {
                             _toggleNode.apply($(this).parent().get(0));
                         })
 
-                        .delegate("div.hitarea", "click", function() {
+                        .delegate("div.hitarea", "click", function () {
                             _toggleNode.apply($(this).parent().get(0));
                         })
 
-                        .delegate("button.previewImage", "click", function(e) {
+                        .delegate("button.previewImage", "click", function (e) {
 
                             var $this = $(this);
                             //                    alert($this.siblings().attr("rel"));
@@ -627,7 +627,7 @@ var xmlEditor = (function() {
                             centeredPopup(popUpURL, 'myWindow', '700', '500', 'yes');
                             return false;
                         })
-                        .delegate("button.clearImage", "click", function(e) {
+                        .delegate("button.clearImage", "click", function (e) {
                             var $this = $(this),
                                     node = _getNodeFromElemAttr($this);
                             _self.setNodeValue(node, "");
@@ -637,7 +637,7 @@ var xmlEditor = (function() {
                             return false;
                         })
 
-                        .delegate("p.nodeValue", "click", function() {
+                        .delegate("p.nodeValue", "click", function () {
 
                             var $this = $(this),
                                     node = _getNodeFromElemAttr($this);
@@ -650,7 +650,7 @@ var xmlEditor = (function() {
                                     lang: _lang,
                                     prefix: "sps",
                                     id: node.getAttribute("sps_id")
-                                }, function(response) {
+                                }, function (response) {
 
                                     if (response.indexOf("<select") > -1) {
                                         var mode = "vocabulary";
@@ -667,7 +667,7 @@ var xmlEditor = (function() {
                                     lang: _lang,
                                     prefix: "ics",
                                     id: node.getAttribute("ics_id")
-                                }, function(response) {
+                                }, function (response) {
                                     if (response.indexOf("<select") > -1) {
                                         var mode = "vocabulary";
                                         _self.editValueSelect($this, node, response, mode, "ics");
@@ -682,8 +682,11 @@ var xmlEditor = (function() {
                                     xpath: _get_XPath(node),
                                     lang: _lang,
                                     prefix: "sps",
-                                    id: node.getAttribute("sps_id")
-                                }, function(response) {
+                                    id: node.getAttribute("sps_id"),
+                                    sourceType: $("#type").val(),
+                                    sourceId: $("#id").val(),
+                                    sourceXML: _self.getXmlAsString()
+                                }, function (response) {
                                     if (response.indexOf("<select") > -1) {
                                         var mode = "entity";
                                         _self.editValueSelect($this, node, response, mode, "sps");
@@ -698,8 +701,11 @@ var xmlEditor = (function() {
                                     xpath: _get_XPath(node),
                                     lang: _lang,
                                     prefix: "ics",
-                                    id: node.getAttribute("ics_id")
-                                }, function(response) {
+                                    id: node.getAttribute("ics_id"),
+                                    sourceType: $("#type").val(),
+                                    sourceId: $("#id").val(),
+                                    sourceXML: _self.getXmlAsString()
+                                }, function (response) {
 
                                     if (response.indexOf("<select") > -1) {
 
@@ -717,7 +723,7 @@ var xmlEditor = (function() {
                                     lang: _lang,
                                     prefix: "sps",
                                     id: node.getAttribute("sps_id")
-                                }, function(response) {
+                                }, function (response) {
                                     if (response.indexOf("<select") > -1) {
                                         var mode = "thesaurus";
                                         _self.editValueSelect($this, node, response, mode, "sps");
@@ -745,7 +751,7 @@ var xmlEditor = (function() {
                                         value: _getNodeValue(node),
                                         type: type,
                                         lang: _lang
-                                    }, function(response) {
+                                    }, function (response) {
 
 
                                         if (response.indexOf("type=") > -1) {
@@ -761,24 +767,24 @@ var xmlEditor = (function() {
                                 }
                             }
                         })
-                        .delegate("a.addChild", "click", function(e) {
+                        .delegate("a.addChild", "click", function (e) {
                             e.preventDefault();
                             var $this = $(this),
                                     node = _getNodeFromElemAttr($this);
                             _self.createChild($this, node);
                         })
-                        .delegate("span.attrValue", "click", function() {
+                        .delegate("span.attrValue", "click", function () {
                             var $this = $(this),
                                     node = _getNodeFromElemAttr($this);
                             _self.editAttribute($this, node, $this.attr("name"), $this.text());
                         })
-                        .delegate("button.addAttr", "click", function(e) {
+                        .delegate("button.addAttr", "click", function (e) {
                             e.preventDefault();
                             var $this = $(this),
                                     node = _getNodeFromElemAttr($this);
                             _self.createAttribute($this, node);
                         })
-                        .delegate("button.killNode", "click", function(e) {
+                        .delegate("button.killNode", "click", function (e) {
                             e.preventDefault();
                             var $this = $(this),
                                     node = _getNodeFromElemAttr($this);
@@ -786,14 +792,14 @@ var xmlEditor = (function() {
                         })
 
                         //Disable links - safest way
-                        .delegate("p.nodeValue a", "click", function(e) {
+                        .delegate("p.nodeValue a", "click", function (e) {
                             e.preventDefault();
                             ev.stopPropagation();
                             return false;
                         })
 
                         //SAM
-                        .delegate("button.remove", "click", function(e) {
+                        .delegate("button.remove", "click", function (e) {
 
                             //Code may seem weird. That is because until version 0.8.5 delete could
                             //only be performed one level up (father node)
@@ -822,7 +828,7 @@ var xmlEditor = (function() {
 
                         })
                         //SAM
-                        .delegate("button.goDown", "click", function(e) {
+                        .delegate("button.goDown", "click", function (e) {
 
                             var utils = new Utils();
                             var $this = $(this);
@@ -853,7 +859,7 @@ var xmlEditor = (function() {
                         })
 
                         //SAM
-                        .delegate("button.goUp", "click", function(e) {
+                        .delegate("button.goUp", "click", function (e) {
                             var utils = new Utils();
                             var $this = $(this);
                             //XML part
@@ -885,7 +891,7 @@ var xmlEditor = (function() {
 
 
                         //SAM
-                        .delegate("button.add", "click", function(e) {
+                        .delegate("button.add", "click", function (e) {
                             var utils = new Utils();
                             var $this = $(this);
                             //Create index for XML-HTML connection
@@ -920,7 +926,7 @@ var xmlEditor = (function() {
                             }
                             var nodeLabelName = label;
                             //Increment paths by 1 for siblings (Using data-path)
-                            $htmlNode.nextAll('[data-path="' + htmlNodePathWithoutPosition + '"]').each(function(index) {
+                            $htmlNode.nextAll('[data-path="' + htmlNodePathWithoutPosition + '"]').each(function (index) {
                                 utils.setPath(this, utils.getNextPath($(this).attr("id")), nodeLabelName);
                             })
 
@@ -939,14 +945,14 @@ var xmlEditor = (function() {
                             }
 
                             //Update allowed actions
-                            $siblings.each(function(index) {
+                            $siblings.each(function (index) {
                                 utils.updateAllowedActions(this, siblingsCount);
                             })
 
                         })
 
                         //SAM
-                        .delegate("button.edit", "click", function(e) {
+                        .delegate("button.edit", "click", function (e) {
 
                             //Only one edit toolbar may exist at a time...
                             _self.$container.find("button.edit").show();
@@ -960,7 +966,7 @@ var xmlEditor = (function() {
                             var type = $("#type").val();
                             var children = "";
                             var childrenPaths = "";
-                            $(node).children().each(function(index) {
+                            $(node).children().each(function (index) {
                                 if (index + 1 < $(node).children().length) {
                                     children = children + this.nodeName + "___";
                                     childrenPaths = childrenPaths + _get_XPath(this) + "___";
@@ -977,36 +983,36 @@ var xmlEditor = (function() {
                                 children: children,
                                 lang: _lang,
                                 childrenPaths: childrenPaths
-                            }, function(response) {
+                            }, function (response) {
                                 _self.editChildren($this, node, response);
                             }, "html")
 
                         })
-                        .delegate("button.icon", "mouseover", function() {
+                        .delegate("button.icon", "mouseover", function () {
                             $(this).css({
                                 opacity: 0.5
                             });
                         })
-                        .delegate("button.icon", "mouseout", function() {
+                        .delegate("button.icon", "mouseout", function () {
                             $(this).css({
                                 opacity: 1
                             });
                         })
-                        .delegate("li.node", "mouseover", function() {
+                        .delegate("li.node", "mouseover", function () {
 
                         })
-                        .delegate("li.node", "mouseout", function() {
+                        .delegate("li.node", "mouseout", function () {
 
                         });
             } else if (view == 1) { //View mode
                 $("#xml")
-                        .delegate("span.nodeName", "click", function() {
+                        .delegate("span.nodeName", "click", function () {
                             _toggleNode.apply($(this).parent().get(0));
                         })
-                        .delegate("div.hitarea", "click", function() {
+                        .delegate("div.hitarea", "click", function () {
                             _toggleNode.apply($(this).parent().get(0));
                         })
-                        .delegate("button.previewImage", "click", function(e) {
+                        .delegate("button.previewImage", "click", function (e) {
 
                             var $this = $(this);
                             var popUpURL;
@@ -1019,7 +1025,7 @@ var xmlEditor = (function() {
                             centeredPopup(popUpURL, 'myWindow', '700', '500', 'yes');
                             return false;
                         })
-                        .delegate("p.nodeValue", "click", function() {
+                        .delegate("p.nodeValue", "click", function () {
                             var $this = $(this),
                                     node = _getNodeFromElemAttr($this);
                             //Had to change due to IE problems
@@ -1031,7 +1037,7 @@ var xmlEditor = (function() {
                                     $btnGo = $("<button class='submit go'>-></button>");
                                     $this.find("button").remove();
                                     $this.append($btnGo);
-                                    $btnGo.click(function() {
+                                    $btnGo.click(function () {
                                         var type = node.getAttribute("sps_type");
                                         var popUpURL = document.URL.replace(/type=([^&]+)/g, "type=" + type);
                                         popUpURL = popUpURL.replace(/id=([^&]+)/g, "id=" + id);
@@ -1055,7 +1061,7 @@ var xmlEditor = (function() {
          * @returns {String}
          * @TODO replace anchor with button
          */
-        getNewNodeHTML: function(node, state, isLast, pathSoFar) {
+        getNewNodeHTML: function (node, state, isLast, pathSoFar) {
 
             var nodeDepth = _getNodeDepth(node);
             var oddOrEven;
@@ -1218,7 +1224,7 @@ var xmlEditor = (function() {
             }
             return nodeHtml;
         },
-        createAllowedActions: function(node, pathIndex, nodePath) {
+        createAllowedActions: function (node, pathIndex, nodePath) {
             //New code to add remove/add functionality...
             var goUpButtonHtml = '<button class="goUp icon" style="display:none;" title="' + _message["goUp"] + '"><img style="vertical-align:top" src="css/arrow_up.png"/></button>';
             var goDownButtonHtml = '<button class="goDown icon" style="display:none;" title="' + _message["goDown"] + '"><img  style="vertical-align:top" src="css/arrow_down.png"/></button>';
@@ -1270,7 +1276,7 @@ var xmlEditor = (function() {
          * @see	_traverseDom
          * @TODO Explore use of documentFragment to optimize DOM manipulation
          */
-        renderAsHTML: function() {
+        renderAsHTML: function () {
 
             var $parent = _self.$container.empty(),
                     $trueParent,
@@ -1356,7 +1362,7 @@ var xmlEditor = (function() {
          * @see	_traverseDom
          * @TODO Explore use of documentFragment to optimize DOM manipulation
          */
-        renderSubTreeAsHTML: function($par, rootNode, rootNodePath) {
+        renderSubTreeAsHTML: function ($par, rootNode, rootNodePath) {
 
             var $parent = $par,
                     $trueParent,
@@ -1440,7 +1446,7 @@ var xmlEditor = (function() {
          * @param 	{Object}	node	XML DOM object
          * @param 	{String}	value
          */
-        setNodeValue: function(node, value) {
+        setNodeValue: function (node, value) {
 
             var $textNodes = _getTextNodes(node);
             if ($textNodes.get(0)) {
@@ -1464,7 +1470,7 @@ var xmlEditor = (function() {
          * @param 	{Object}	node	XML DOM object
          * @param 	{String}	value
          */
-        setAttribute: function(node, attributeName, attributeValue) {
+        setAttribute: function (node, attributeName, attributeValue) {
             $(node).attr(attributeName, attributeValue);
         },
         /**
@@ -1473,7 +1479,7 @@ var xmlEditor = (function() {
          * @param 	{Object}	node	XML DOM object
          * @TODO need to separate this into render vs modify components
          */
-        editChildren: function($editButton, node, response) {
+        editChildren: function ($editButton, node, response) {
 
             $editButton.hide();
             $editButton.siblings("select").remove();
@@ -1489,7 +1495,7 @@ var xmlEditor = (function() {
             var schemaChildren = $schemaChildrenString.val().split("___");
             var $submit1 = $("<button style='margin-left:3px;' class='submit'>" + _message["add"] + "</button>").click(processCreateChild);
             var $submit2 = $("<button style='margin-left:3px;' class='submit'>" + _message["delete"] + "</button>").click(processRemoveChild);
-            var $cancel = $("<button style='margin-left:3px;' class='killChild cancel'>" + _message["cancel"] + "</button>").click(function() {
+            var $cancel = $("<button style='margin-left:3px;' class='killChild cancel'>" + _message["cancel"] + "</button>").click(function () {
                 $(this).remove();
                 $submit1.remove();
                 $select1.remove();
@@ -1501,7 +1507,7 @@ var xmlEditor = (function() {
                 $editButton.show();
             });
             $cancel.insertAfter($submit2.insertAfter($select2.insertAfter($submit1.insertAfter($select1.insertAfter($editButton)))));
-            $select2.bind('change', function() { //yada yada });
+            $select2.bind('change', function () { //yada yada });
                 var childPath = $select2.val();
                 $editButtonParent.find("ul.children > li").css({
                     "border": ""
@@ -1510,7 +1516,7 @@ var xmlEditor = (function() {
                     "border": "2px dotted #990000"
                 });
             });
-            $select2.bind('click', function() {
+            $select2.bind('click', function () {
                 var childPath = $select2.val();
                 $editButtonParent.find("ul.children > li").css({
                     "border": ""
@@ -1656,7 +1662,7 @@ var xmlEditor = (function() {
          * Returns string representation of private XML object
          * @return	{String}
          */
-        getXmlAsString: function() {
+        getXmlAsString: function () {
             return (typeof XMLSerializer !== "undefined") ?
                     (new window.XMLSerializer()).serializeToString(_self.xml) :
                     _self.xml.xml;
@@ -1668,7 +1674,7 @@ var xmlEditor = (function() {
          * @exception	{GeneralException}	Throws exception if no XML parser is available.
          * @TODO Should use this instead of loading XML into DOM via $.ajax()
          */
-        getXmlDOMFromString: function(xmlStr) {
+        getXmlDOMFromString: function (xmlStr) {
             if (window.ActiveXObject && window.GetObject) {
 
                 var dom = new ActiveXObject('Microsoft.XMLDOM');
@@ -1697,7 +1703,7 @@ var xmlEditor = (function() {
          * @param 	{Objecct}	node
          * @TODO Try using an HTML block (string) instead, and assign handlers using delegate()
          */
-        createAttribute: function($addLink, node) {
+        createAttribute: function ($addLink, node) {
             var $parent = $addLink.parent(),
                     $form = $("<form></form>"),
                     $name = $("<input type='text' class='newAttrName'  name='attrName'  value=''/>"),
@@ -1726,13 +1732,13 @@ var xmlEditor = (function() {
                         ((aValue === "") ? "&nbsp;" : aValue) + "</span>\"</span>").insertBefore($addLink);
                 $parent
                         .find("span.attrValue:last")
-                        .click(function(e) {
+                        .click(function (e) {
                             e.stopPropagation();
                             _self.editAttribute($(this), node, aName, aValue);
                         });
                 $addLink.show();
             } // end of processNewAttribute()
-            $form.submit(function() {
+            $form.submit(function () {
                 return false;
             })
                     .append($name)
@@ -1742,26 +1748,26 @@ var xmlEditor = (function() {
                     .append($cancel);
             $addLink.hide();
             $parent.append($form);
-            $form.find("input").click(function(e) {
+            $form.find("input").click(function (e) {
                 e.stopPropagation();
             });
-            $form.find("input.newAttrName").bind("keydown", function(e) {
+            $form.find("input.newAttrName").bind("keydown", function (e) {
                 if (e.keyCode == 13 || e.keyCode == 27) {
                     return false;
                 }
             });
-            $form.find("input.newAttrValue").bind("keydown", function(e) {
+            $form.find("input.newAttrValue").bind("keydown", function (e) {
                 if (e.keyCode == 13 || e.keyCode == 27) {
                     processNewAttribute();
                 }
             });
             $name.focus();
-            $submit.click(function(e) {
+            $submit.click(function (e) {
                 e.stopPropagation();
                 e.preventDefault();
                 processNewAttribute();
             });
-            $cancel.click(function(e) {
+            $cancel.click(function (e) {
                 e.stopPropagation();
                 $form.remove();
                 $addLink.show();
@@ -1774,10 +1780,10 @@ var xmlEditor = (function() {
          * @param {String}	name
          * @param {String}	value
          */
-        editAttribute: function($valueWrap, node, name, value) {
+        editAttribute: function ($valueWrap, node, name, value) {
             var fieldWidth = parseInt($valueWrap.width()) + 30,
                     $field = $("<input type='text' name='' value='" + value + "' style='width:" + fieldWidth + "px;'/>"),
-                    $killAttr = $("<button class='killAttr icon'/>").click(function(e) {
+                    $killAttr = $("<button class='killAttr icon'/>").click(function (e) {
                 e.stopPropagation();
                 if (confirm(_message["removeAttrConfirm"])) {
                     $(node).removeAttr(name);
@@ -1800,12 +1806,12 @@ var xmlEditor = (function() {
             $valueWrap.parent().append($killAttr);
             $field.get(0).focus();
             $field
-                    .bind("keydown", function(e) {
+                    .bind("keydown", function (e) {
                         if (e.keyCode == 13 || e.keyCode == 27) {
                             updateAttribute();
                         }
                     })
-                    .click(function(e) {
+                    .click(function (e) {
                         e.stopPropagation();
                     });
         },
@@ -1817,7 +1823,7 @@ var xmlEditor = (function() {
          * @TODO Wrap in form.editValue
          * @TODO use delegate()
          */
-        editValue: function($valueWrap, node, value, html, schemaCheckResponse) {
+        editValue: function ($valueWrap, node, value, html, schemaCheckResponse) {
             //              alert("1="+value);
             var example = "";
             if (!html && schemaCheckResponse.length > 0) {
@@ -1931,7 +1937,7 @@ var xmlEditor = (function() {
                 var xml = _self.getXmlAsString();
                 var $test = $($.parseXML(xml)).find("Entity").children("Link");
                 var selectOptions = {};
-                $test.each(function() {
+                $test.each(function () {
                     var $link = $(this);
                     if ($link.text().length > 0) {
                         if (this.getAttributeNode("ics_type")) {
@@ -1943,7 +1949,7 @@ var xmlEditor = (function() {
                 });
                 //Change because of change at InfoText schema 
                 $test = $($.parseXML(xml)).find("Components").children("Component").children("Link");
-                $test.each(function() {
+                $test.each(function () {
                     var $link = $(this);
                     if ($link.text().length > 0) {
                         if (this.getAttributeNode("ics_type")) {
@@ -1956,10 +1962,10 @@ var xmlEditor = (function() {
                 });
                 //Addition (ZOMINTHOS). May have to change previous blocks accordingly...
                 $test = $($.parseXML(xml)).find("BibliographicReference").children("Link");
-                $test.each(function() {
+                $test.each(function () {
                     var $link = $(this);
                     if ($link.text().length > 0) {
-                        selectOptions["Index?action=view&type=" + $link.attr("sps_type") + "&id=" + $link.attr("sps_id")+"&lang="+lang] = $link.text();
+                        selectOptions["Index?action=view&type=" + $link.attr("sps_type") + "&id=" + $link.attr("sps_id") + "&lang=" + lang] = $link.text();
                     }
                 });
 
@@ -1978,7 +1984,7 @@ var xmlEditor = (function() {
 
 
 
-            $editForm.submit(function() {
+            $editForm.submit(function () {
                 if (html) {
                     var content = myNicEditor.instanceById(nodePath).getContent();
                     myNicEditor.removeInstance(nodePath);
@@ -2012,14 +2018,14 @@ var xmlEditor = (function() {
                     $valueWrap.text(value).show().parent().find("form, textarea,input,label, div.editTextValueButtons").remove();
                 }
             });
-            $btnCancel.click(function() {
+            $btnCancel.click(function () {
                 if (html) {
                     myNicEditor.removeInstance(nodePath);
                 }
                 $valueWrap.show().parent().find("form, textarea,label, input, div.editTextValueButtons").remove();
             });
         },
-        editValueBrowse: function($valueWrap, node, prefix) {
+        editValueBrowse: function ($valueWrap, node, prefix) {
             //            var imageId = "$valueWrap.parent().parent().parent().attr("id");
             $uploadForm = $("<form id='upload-form' action='' method='post' enctype='multipart/form-data'>"
                     + "<div id='jquery-wrapped-fine-uploader'></div>"
@@ -2043,7 +2049,7 @@ var xmlEditor = (function() {
                     allowedExtensions = ['doc', 'docx', 'pdf'];
                     uploadMessage = _message["uploadDocsMessage"];
                 } else if (fileType == 'all') {
-                    allowedExtensions = ['jpeg', 'jpg', 'gif', 'png', 'mp3', 'zip', 'mp4', 'doc', 'docx', 'pdf', 'avi', 'mpeg', 'dwg'];
+                    allowedExtensions = ['jpeg', 'jpg', 'gif', 'png', 'bmp','tif', 'mp3', 'zip', 'mp4', 'doc', 'docx', 'pdf', 'avi', 'mpeg', 'dwg'];
                     uploadMessage = _message["uploadAllMessage"];
                 }
             }
@@ -2075,7 +2081,7 @@ var xmlEditor = (function() {
                     enableTooltip: true
                 },
                 debug: false
-            }).on('complete', function(event, id, fileName, responseJSON) {
+            }).on('complete', function (event, id, fileName, responseJSON) {
                 if (responseJSON.success) {
                     filename = responseJSON.filename;
                     var mime = responseJSON.mime
@@ -2107,7 +2113,7 @@ var xmlEditor = (function() {
                     $valueWrap.parent().find('.qq-upload-button').css('background-image', 'url("' + url + '")');
                 }
             });
-            $btnSubmit.click(function() {
+            $btnSubmit.click(function () {
                 $valueWrap.show().parent().find("form, input, div.editTextValueButtons, button").remove();
                 $valueWrap.children("img").attr("src", url).attr("title", filename).attr("alt", filename).attr("rel", binaryUrl);
                 var $btnClear = $("<button style='position:relative;top:-50px;' class='clearImage'>X</button>");
@@ -2115,7 +2121,7 @@ var xmlEditor = (function() {
                 $valueWrap.append($btnClear).append($btnPreview);
                 $valueWrap.show();
             });
-            $btnCancel.click(function() {
+            $btnCancel.click(function () {
 
                 $valueWrap.show().parent().find("form, input, div.editTextValueButtons").remove();
             });
@@ -2128,7 +2134,7 @@ var xmlEditor = (function() {
          * @TODO Wrap in form.editValue
          * @TODO use delegate()
          */
-        editValueSelect: function($valueWrap, node, response, mode, prefix) {
+        editValueSelect: function ($valueWrap, node, response, mode, prefix) {
             var nodePath = _get_XPath(node)
             var $field = $(response),
                     $btnSubmit = $("<button class='submit' style='float:left;'>ΟΚ</button>"),
@@ -2152,7 +2158,7 @@ var xmlEditor = (function() {
             $field.parent().find("select").chosen({
                 search_contains: true
             });
-            $btnSubmit.click(function() {
+            $btnSubmit.click(function () {
                 var select = $(this).parent().parent()[0].getElementsByTagName("select")[0];
                 value = $field.val();
                 autoForXpath($("#type").attr("value"), nodePath, value);
@@ -2175,19 +2181,22 @@ var xmlEditor = (function() {
             if (mode === "entity") {
                 var select = $field.get(0);
                 var data_type = select.options[select.selectedIndex].getAttribute("data-type");
-                $field.change(function() {
+                if (photoTypes.indexOf(data_type) > -1) {
 
-                    var imagePath = select.options[select.selectedIndex].getAttribute("image-path")
-                    $image = $('<img>', {
-                        src: "FetchBinFile?size=small&file=" + data_type + "/Photos/" + imagePath,
-                        height: 36,
-                        title: $field.val(),
-                        class: "thumb"
+                    $field.change(function () {
 
+                        var imagePath = select.options[select.selectedIndex].getAttribute("image-path")
+                        $image = $('<img>', {
+                            src: "FetchBinFile?size=small&file=" + data_type + "/Photos/" + imagePath,
+                            height: 36,
+                            title: $field.val(),
+                            class: "thumb"
+
+                        });
+                        $valueWrap.hide().parent().append($field).find("img").remove();
+                        $valueWrap.hide().parent().append($field).append($image).append($btnGo).append($btnNew).append($btnWrap);
                     });
-                    $valueWrap.hide().parent().append($field).find("img").remove();
-                    $valueWrap.hide().parent().append($field).append($image).append($btnGo).append($btnNew).append($btnWrap);
-                });
+                }
                 //add photo next to combo
                 var $image = "";
                 if (photoTypes.indexOf(data_type) > -1) {
@@ -2210,7 +2219,7 @@ var xmlEditor = (function() {
                 var linkEntitiesCount = $optgroups.length;
 
                 if (linkEntitiesCount > 1) {
-                    $optgroups.each(function() {
+                    $optgroups.each(function () {
                         var entityType = $(this).attr("label");
                         var popUpURL = "File?action=New&type=" + entityType + "&lang=" + lang;
                         var clickScript = "centeredPopup('" + popUpURL + "', 'myWindow', '700', '500', 'yes');return false;";
@@ -2232,10 +2241,10 @@ var xmlEditor = (function() {
                     var $btnNew = $("<button class='submit createNew' onclick=\"" + clickScript + "\">" + _message["createNew"] + "</button>");
                 }
 
-
+                $valueWrap.hide().parent().find("img").remove();
                 $valueWrap.hide().parent().append($field).append($image).append($btnGo).append($btnNew).append($btnWrap);
 
-                $btnGo.click(function() {
+                $btnGo.click(function () {
                     var select = $(this).parent().parent()[0].getElementsByTagName("select")[0];
                     value = $field.val();
                     var id = select.options[select.selectedIndex].getAttribute("data-id");
@@ -2249,7 +2258,7 @@ var xmlEditor = (function() {
                 });
             } else if (mode == "vocabulary") {
                 //adds terms to vocabulary
-                $btnVoc.click(function() {
+                $btnVoc.click(function () {
                     $(this).hide();
                     var $newTermDiv = $("<div class='newTermDiv' style='margin:3px;padding:3px;width:400px;border:1px dotted black;'></div>");
                     $boldText = $("<b> " + _message['newTerm'] + "</b>");
@@ -2258,7 +2267,7 @@ var xmlEditor = (function() {
                     $btnCancelVoc = $("<button class='subbmit' id='removeTermButton'>X</button>");
                     $newTermDiv = $newTermDiv.append($boldText).append($textVoc).append($btnAddTerm).append($btnCancelVoc);
                     $valueWrap.hide().parent().append($field).append($(this)).append($newTermDiv).append($btnWrap);
-                    $btnAddTerm.click(function() {
+                    $btnAddTerm.click(function () {
                         var thisInput = $(this).siblings("input");
                         var term = thisInput.val();
                         term = term.toString();
@@ -2283,7 +2292,7 @@ var xmlEditor = (function() {
                             newTerm: term,
                             lang: _lang,
                             vocFile: vocabulary
-                        }, function(response) {
+                        }, function (response) {
                             id = response.replace(/\s+/g, "");
                             $option = $("<option value='" + term + "' data-id='" + id + "'>" + term + "</option>");
                             $select.append($option);
@@ -2292,7 +2301,7 @@ var xmlEditor = (function() {
                         alert(_message['addedTerm']);
                         _self.setAttribute(thisInput, "value", "");
                     });
-                    $btnCancelVoc.click(function() {
+                    $btnCancelVoc.click(function () {
                         var voc = $(this).parent().siblings("button#voc");
                         voc.show();
                         $valueWrap.show().parent().find("div.newTermDiv").remove();
@@ -2300,7 +2309,7 @@ var xmlEditor = (function() {
                     });
                 });
             } else if (mode === "thesaurus") {
-                $btnTh.click(function() {
+                $btnTh.click(function () {
                     var select = $(this).parent().parent()[0].getElementsByTagName("select")[0];
                     value = $field.val();
                     var selectedValueId = select.options[select.selectedIndex].getAttribute("data-id");
@@ -2318,11 +2327,11 @@ var xmlEditor = (function() {
                 });
             }
 
-            $btnCancel.click(function() {
+            $btnCancel.click(function () {
                 $valueWrap.show().parent().find("select,button, div.editTextValueButtons,button#voc,img, div, input, b").remove();
             });
         },
-        deleteNode: function(node, $editButtonParent, childName, childPath, posAsInt) {
+        deleteNode: function (node, $editButtonParent, childName, childPath, posAsInt) {
 
             //No need for position anymore...deleting it
             childName = childName.replace(/\[\d+\]/g, "")
@@ -2346,7 +2355,7 @@ var xmlEditor = (function() {
             var nodeLabelName = label;
             //Find following siblings with class name that starts the same way as the one removed and change
             //id and title to reflect new position
-            $editButtonParent.find("ul.children > li[id='" + childPath + "']").nextAll('[data-path="' + dataPath + '"]').each(function(index) {
+            $editButtonParent.find("ul.children > li[id='" + childPath + "']").nextAll('[data-path="' + dataPath + '"]').each(function (index) {
 
                 utils.setPath(this, utils.getPreviousPath($(this).attr("id")), nodeLabelName); //Νεα λογική
 
@@ -2354,13 +2363,13 @@ var xmlEditor = (function() {
             //Code added to hide remove button if element cannot be removed!
             var remainingSibsCount = $(node).children(nameToDelete).length;
             if (parseInt(remainingSibsCount) == parseInt(minOccurs[pathIndex])) {
-                $editButtonParent.find("ul.children > li[data-path='" + dataPath + "']").each(function(index) {
+                $editButtonParent.find("ul.children > li[data-path='" + dataPath + "']").each(function (index) {
                     $(this).children(".actionButtons").children("button.remove").hide();
                 });
             }
 
             if (remainingSibsCount == 1) {
-                $editButtonParent.find("ul.children > li[data-path='" + dataPath + "']").each(function(index) {
+                $editButtonParent.find("ul.children > li[data-path='" + dataPath + "']").each(function (index) {
 
                     $(this).children(".actionButtons").children("button.goUp").hide();
                     $(this).children(".actionButtons").children("button.goDown").hide();
@@ -2380,7 +2389,7 @@ var xmlEditor = (function() {
          * @param 	{String}	name
          * @return	{Boolean}
          */
-        removeNode: function($link, node) {
+        removeNode: function ($link, node) {
             if (confirm(_message["removeNodeConfirm"])) {
                 $(node).remove();
                 var $prev = $link.parent().prev();
@@ -2404,20 +2413,20 @@ var xmlEditor = (function() {
          * @param {String}		containerSelector	CSS query selector for creating jQuery reference to container
          * @param {Function}	callback
          */
-        loadXmlFromFile: function(xmlPath, containerSelector, callback) {
+        loadXmlFromFile: function (xmlPath, containerSelector, callback) {
             _self.$container = $(containerSelector);
             $.ajax({
                 type: "GET",
                 async: false,
                 url: xmlPath,
                 dataType: "xml",
-                error: function() {
+                error: function () {
                     GLR.messenger.show({
                         msg: _message["xmlLoadProblem"],
                         mode: "error"
                     });
                 },
-                success: function(xml) {
+                success: function (xml) {
                     GLR.messenger.show({
                         msg: _message["xmlLoadSuccess"],
                         mode: "success"
@@ -2433,24 +2442,24 @@ var xmlEditor = (function() {
          * @param {String}		containerSelector	CSS query selector for creating jQuery reference to container
          * @param {Function}	callback
          */
-        loadXmlFromString: function(xmlString, containerSelector, callback) {
+        loadXmlFromString: function (xmlString, containerSelector, callback) {
             _self.$container = $(containerSelector);
             _self.xml = _self.getXmlDOMFromString(xmlString);
             callback();
         },
-        setDepth: function(depth) {
+        setDepth: function (depth) {
             _depthThreshold = depth;
         },
-        setLang: function(lang) {
+        setLang: function (lang) {
             _lang = lang;
         },
-        showAttrs: function() {
+        showAttrs: function () {
             _showAttributes = true;
         },
         /**
          * Calls methods for generating HTML representation of XML, then makes it collapsible/expandable
          */
-        renderTree: function() {
+        renderTree: function () {
 
             GLR.messenger.inform({
                 msg: _message["renderingHtml"],
@@ -2466,7 +2475,7 @@ var xmlEditor = (function() {
         /**
          * Calls methods for generating HTML representation of XML, then makes it collapsible/expandable
          */
-        renderSubTree: function($parent, rootNode, rootNodePath) {
+        renderSubTree: function ($parent, rootNode, rootNodePath) {
             GLR.messenger.show({
                 msg: _message["renderingHtml"],
                 mode: "loading"

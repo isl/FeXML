@@ -75,6 +75,8 @@ public class BasicServlet extends HttpServlet {
     protected static String username;
     public static String URI_Reference_Path, resizeDimension;
     public static int thumbSize, normalSize;
+    protected static String fedoraStatus = "";
+    protected static String fedoraUrl = "";
 
     // The strings used to build the query that asks for query source text, from file
     // DMSQueries.xml.
@@ -121,6 +123,8 @@ public class BasicServlet extends HttpServlet {
             connectionPool = ConnectionPool.getInstance();
 
             configured = true;
+            this.fedoraStatus = getServletContext().getInitParameter("fedoraStatus");
+            this.fedoraUrl = getServletContext().getInitParameter("fedoraUrl");
 
         }
 
@@ -660,11 +664,12 @@ public class BasicServlet extends HttpServlet {
             return null;
         }
     }
+
     public static boolean isVisibleFromXPath(String type, String xpath, String lang) {
         xpath = xpath.replaceAll("\\[\\d++\\]", "");
         DBFile nodesFile = new DBFile(BasicServlet.DBURI, applicationCollection + "/LaAndLi", type + ".xml", BasicServlet.DBuser, BasicServlet.DBpassword);
         String[] displayValues = nodesFile.queryString("//node[xpath='" + xpath + "']/@display/string()");
-       
+
         if (displayValues != null && displayValues.length > 0) {
             return false;
         } else {

@@ -612,5 +612,6 @@ div#labels label
 
 /* Change the background color of the dropdown button when the dropdown content is shown */
 .dropdown:hover .dropbtn {
-    background-color: #936C28;//#3e8e41;
+    /*#3e8e41;*/
+    background-color: #936C28;    
 }

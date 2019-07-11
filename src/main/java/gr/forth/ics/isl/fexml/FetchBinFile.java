@@ -27,10 +27,13 @@
  */
 package gr.forth.ics.isl.fexml;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URL;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -42,9 +45,8 @@ import javax.servlet.http.HttpServletResponse;
 public class FetchBinFile extends BasicServlet {
 
     /**
-     * Processes requests for both HTTP
-     * <code>GET</code> and
-     * <code>POST</code> methods.
+     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
+     * methods.
      *
      * @param request servlet request
      * @param response servlet response
@@ -53,14 +55,17 @@ public class FetchBinFile extends BasicServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-           request.setCharacterEncoding("UTF-8");
-
-
+        request.setCharacterEncoding("UTF-8");
+        OutputStream out = response.getOutputStream();
         // Get the absolute path of the image ServletContext sc = getServletContext();
-        String path = uploadsFolder;
+        String path = "";
+        if (this.fedoraStatus.equals("on")) {
+            path = this.fedoraUrl + "uploads/";
+        } else {
+            path = uploadsFolder;
+        }
         String filename = request.getParameter("file");
         String size = request.getParameter("size");
-
         if (size == null) {
             size = "original";
         } else {
@@ -77,41 +82,60 @@ public class FetchBinFile extends BasicServlet {
         if (path.contains("/Photos/")) {
             path = path.replaceAll("/Photos/", "/Photos/" + size + "/");
         }
+        if (this.fedoraStatus.equals("on")) {
+            URL urlConn = new URL(path);
+            InputStream inputStream = urlConn.openStream();
+            ByteArrayOutputStream output = new ByteArrayOutputStream();
+            byte[] buffer = new byte[1024];
 
-        filename = filename.substring(filename.lastIndexOf("/") + 1);
-        // Set content size
-        File file = new File(path);
-        if (!file.exists()) {
-            file = new File(uploadsFolder + "empty_photo.jpg");
-            response.setContentType("image/jpeg");
-        } else {
+            int n = 0;
+            while (-1 != (n = inputStream.read(buffer))) {
+                output.write(buffer, 0, n);
+            }
             if (response.getContentType() == null) {
                 response.setContentType(mimeType + ";charset=UTF-8");
                 response.setHeader("Content-disposition", "inline; filename=\"" + filename + "\"");
             }
+
+            inputStream.close();
+
+            // Here's the content of the image...
+            byte[] data = output.toByteArray();
+
+            out.write(data);
+        } else {
+            filename = filename.substring(filename.lastIndexOf("/") + 1);
+            // Set content size
+            File file = new File(path);
+            if (!file.exists()) {
+                file = new File(uploadsFolder + "empty_photo.jpg");
+                response.setContentType("image/jpeg");
+            } else {
+                if (response.getContentType() == null) {
+                    response.setContentType(mimeType + ";charset=UTF-8");
+                    response.setHeader("Content-disposition", "inline; filename=\"" + filename + "\"");
+                }
+            }
+
+            response.setContentLength((int) file.length());
+            // Open the file and output streams
+            FileInputStream in = new FileInputStream(file);
+
+            // Copy the contents of the file to the output stream
+            byte[] buf = new byte[1024];
+            int count = 0;
+            while ((count = in.read(buf)) >= 0) {
+                out.write(buf, 0, count);
+            }
+            in.close();
+            out.close();
         }
 
-
-
-        response.setContentLength((int) file.length());
-        // Open the file and output streams
-        FileInputStream in = new FileInputStream(file);
-        OutputStream out = response.getOutputStream();
-
-        // Copy the contents of the file to the output stream
-        byte[] buf = new byte[1024];
-        int count = 0;
-        while ((count = in.read(buf)) >= 0) {
-            out.write(buf, 0, count);
-        }
-        in.close();
-        out.close();
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
-     * Handles the HTTP
-     * <code>GET</code> method.
+     * Handles the HTTP <code>GET</code> method.
      *
      * @param request servlet request
      * @param response servlet response
@@ -124,8 +148,7 @@ public class FetchBinFile extends BasicServlet {
     }
 
     /**
-     * Handles the HTTP
-     * <code>POST</code> method.
+     * Handles the HTTP <code>POST</code> method.
      *
      * @param request servlet request
      * @param response servlet response

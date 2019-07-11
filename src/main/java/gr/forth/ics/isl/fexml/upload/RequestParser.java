@@ -89,7 +89,7 @@ public class RequestParser {
 
         //And use all of the above parts to create a unique random file name
         //var uniquename = results[0] + timestamp + datestamp + random +"." + results[1];
-        String uniquename = justName + "###___###"+datestamp + timestamp +"###___###"+ randomNumber + "." + fileExtension;
+        String uniquename = justName + "___" + datestamp + timestamp + "___" + randomNumber + "." + fileExtension;
 
         return uniquename;
     }

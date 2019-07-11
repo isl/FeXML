@@ -79,6 +79,10 @@ public class Query extends BasicServlet {
         String lang = request.getParameter("lang");
         String value = request.getParameter("value");
 
+        String sourceType = request.getParameter("sourceType");
+        String sourceId = request.getParameter("sourceId");
+        String sourceXML = request.getParameter("sourceXML");
+        
         //Prefix added so that code handles both sps_ and ics_ attribute names...
         String prefix = request.getParameter("prefix");
         if (prefix == null) {
@@ -137,6 +141,8 @@ public class Query extends BasicServlet {
                                 StringBuilder pathCondition = new StringBuilder("[");
                                 StringBuilder pathOutput = new StringBuilder("");
 
+                                valueFromXpath = calculateInlineValues(valueFromXpath, sourceType, sourceId, sourceXML);
+
                                 //Experimental:Changed pathOutput from // to / (Zominthos)
                                 if (valueFromXpath.contains(",")) {
                                     String[] paths = valueFromXpath.split(",");
@@ -144,7 +150,7 @@ public class Query extends BasicServlet {
 
                                     for (String path : paths) {
                                         if (!path.endsWith("]")) {//add [1] tp avoid cardinality issues
-                                            path = path +"[1]";
+                                            path = path + "[1]";
                                         }
 
                                         pathCondition = pathCondition.append(path).append("!='' or");
@@ -197,6 +203,7 @@ public class Query extends BasicServlet {
                                 result = result + dbc.query(query)[0];
                             }
                             result = result.replaceAll("(?s)</select><select[^>]+>[^<]+.*?(?=<optgroup)", "");
+//                            System.out.println(result);
                         }
                     } else {//Facet code
                         String facetProps = getFacetProperties(xpath, prefix);
@@ -225,7 +232,6 @@ public class Query extends BasicServlet {
                                     + "&answerType=XMLSTREAM&pageFirstResult=SaveAll"
                                     + "&operator_term=or&output_term1=name" + urlEnd
                                     + facetURLpart;
-
                             String themasServiceResponse = utils.consumeService(serviceURL);
                             if (themasServiceResponse.contains("<terms count=\"0\">")) {//Hierarchy, not facet, should call service again
                                 System.out.println("IT'S A HIERARCHY!");
@@ -560,9 +566,11 @@ public class Query extends BasicServlet {
                 } else {
                     uniqueXpath = linkToPath;
                 }
-
                 //Added next line in case I use [1] etc...e.g. Συγγραφέας σε Βιβλιογραφία...
                 uniqueXpath = uniqueXpath.replaceAll("\\[\\d++\\]", "");
+                uniqueXpath = uniqueXpath.replaceAll("\\[.*\\]", "");
+//                                System.out.println("2="+uniqueXpath);
+
                 String[] typeOfvaluesFromTable = nodesCol.query("//node[xpath='" + uniqueXpath + "']/@type/string()");
                 if (typeOfvaluesFromTable != null && typeOfvaluesFromTable.length > 0) {
 
@@ -573,6 +581,31 @@ public class Query extends BasicServlet {
         }
         return result;
 
+    }
+
+    private String calculateInlineValues(String paths, String sourceType, String sourceId, String sourceXML) {
+
+        ArrayList<String> inlinePaths = findReg("\\{\\{.*?\\}\\}", paths, 0);
+        for (String inPath : inlinePaths) {
+            String modifiedPath = "//" + inPath.substring(2, inPath.length() - 2) + "/string()";
+
+            DBCollection dbc = new DBCollection(BasicServlet.DBURI, applicationCollection + "/Temp", BasicServlet.DBuser, BasicServlet.DBpassword);
+
+            DBFile dbf = dbc.createFile(sourceType + sourceId + ".xml", "XMLDBFile");
+            dbf.setXMLAsString(sourceXML);
+            dbf.store();
+
+            String[] res = dbf.queryString(modifiedPath);
+            String actualValue = "";
+            if (res != null && res.length > 0) {
+                actualValue = res[0];
+            }
+            paths = paths.replace(inPath, actualValue);
+            dbf.remove();
+
+        }
+
+        return paths;
     }
 
     private String getVocabulary(String xpath, String prefix) {

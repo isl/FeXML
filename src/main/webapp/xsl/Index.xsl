@@ -271,7 +271,47 @@ This file is part of the FeXML webapp.
                 <textarea id="xmlString" style="display:none;">
                    
                 </textarea>
-
+                <div class="footer">                       
+                    <div style="background-color:#5B5B5B;height:63px;margin-top:5px;margin-bottom:5px;">
+                        <a href="http://www.ics.forth.gr/" target="_blank">
+                            <img id="forthImg" src="{concat('img/forth_',$lang,'.png')}"/>
+                        </a>
+                        <a href="http://www.ics.forth.gr/isl" target="_blank">
+                            <img src="{concat('img/isl_',$lang,'.png')}"/>
+                        </a>
+                        <a href="https://www.ics.forth.gr/isl/index_main.php?c=252" target="_blank">
+                            <img src="{concat('img/cci_',$lang,'.png')}"/>
+                        </a>
+                    </div>                              
+                </div>
+                <script src="js/ext/jquery-1.7.2.min.js"></script>
+                <div class="footer2">                       
+                    <div  style="padding-top:13px;font-size:12px;color:white;">
+                        <a style="color:white!important;text-decoration:none;" target="_blank" href="/{$synthesisName}/Privacy?action=conditions&amp;lang={$lang}">
+                            <xsl:choose>
+                                <xsl:when test="$lang='gr'">Όροι Χρήσης</xsl:when>
+                                <xsl:otherwise>Terms of Use</xsl:otherwise>
+                            </xsl:choose>
+                        </a>
+                        |
+                        <a target="_blank" style="padding-left:0px!important;color:white!important;text-decoration:none;" href="/{$synthesisName}/Privacy?action=privacy&amp;lang={$lang}">
+                            <xsl:choose>
+                                <xsl:when test="$lang='gr'">Πολιτική Προστασίας</xsl:when>
+                                <xsl:otherwise>Privacy Policy</xsl:otherwise>
+                            </xsl:choose>
+                        </a>
+                        | © 
+             
+                        2012-<span id="year">2019</span> 
+                        <script>$("#year").html((new Date()).getFullYear());</script>
+                        <a target="_blank" style="font-size:12px;padding-left:0px!important;color:white!important;text-decoration:none;" href="http://www.ics.forth.gr/isl"> FORTH-ICS</a>
+                        |
+                        <xsl:choose>
+                            <xsl:when test="$lang='gr'">Αδειοδότηση υπό τους όρους της EUPL</xsl:when>
+                            <xsl:otherwise>Licensed under the EUPL</xsl:otherwise>
+                        </xsl:choose>
+                    </div>
+                </div>
                 <xsl:if test="//output/attributes">
                     <input type="hidden" id="attributes" value="{//output/attributes}" name="attributes"></input>
                 </xsl:if>
@@ -289,7 +329,6 @@ This file is part of the FeXML webapp.
                 <input type="hidden" id="xmlId" value="{//output/xmlId}" name="xmlId"></input>
                 <input type="hidden" id="entityType" value="{//output/entityType}" name="entityType"></input>
                
-                <script src="js/ext/jquery-1.7.2.min.js"></script>
                 <script  src="js/ext/jquery-color.js"></script>
                 <script  src="js/ext/GLR/GLR.js"></script>
                 <script src="js/ext/GLR/GLR.messenger.js"></script>
